@@ -1,0 +1,24 @@
+body {
+    margin: 0;
+    box-sizing: border-box;
+}
+#heading {
+    text-align: center;
+}
+#raceChart {
+    height: 100vh;
+    width: 100%;
+}
+#date {
+    margin: 0;
+    display: inline;
+}
+#date { 
+    margin: 0.5rem;
+}
+.x-axis {
+    transform: translate(10px, 10px);
+}
+.details {
+    margin: 1rem;
+}
