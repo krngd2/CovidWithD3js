@@ -5,5 +5,5 @@ export interface CovidData {
     deceased: number,
     recovered: number,
     date: string,
-    name: string
+    district: string
 }
