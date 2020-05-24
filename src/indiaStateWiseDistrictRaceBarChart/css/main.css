@@ -3,6 +3,7 @@
 body {
     margin: 0;
     box-sizing: border-box;
+    font-family: 'Exo 2', sans-serif;
 }
 #heading {
     text-align: center;
@@ -14,8 +15,51 @@ body {
 .x-axis {
     transform: translate(10px, 10px);
 }
+
+select {
+    margin-bottom: 1em;
+    margin-right: 5em;
+    margin-left: 23em;
+    padding: .25em;
+    border: 0;
+    border-bottom: 2px solid currentcolor;
+    font-weight: bold;
+    letter-spacing: .15em;
+    border-radius: 0;
+    &:focus, &:active {
+      outline: 0;
+      border-bottom-color: red;
+    }
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    position: relative;
+    margin-right: 5em;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 10em;
+    height: 2px;
+    margin-bottom:.1em;
+    border-radius: 3px;
+    background-color: #eee;
+    border: 2px solid #ccc;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 510%;
+    background: #141414;
+    border: 2px solid #515151;
+    margin-top: -5px;
+    cursor: pointer
+  }
+
 .details {
-    margin: 1rem;
+    margin: 2rem;
+
 }
 .details div {
     display: inline-block;
