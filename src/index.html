@@ -4,21 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telangana Covid Cases</title>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 </head>
 <body>
-    <h3 id="heading">District wise COVID-19 cases by date</h3>
-    <div class="details">
-        <label for="select_state"> Select State</label>
-        <select name="select_state" id="select_state"></select>
-        <h2 id="date"></h2>
-        <input type="range" id="dateRange">
-    </div>
+    <section class="container">
+        <h2>D3 Data Visualization</h2> <br> 
+        <div class="card" style="width: 18rem;">
+            <!-- <img src="..." class="card-img-top" alt="..."> -->
+            <div class="card-body">
+                <h5 class="card-title">Indian District level Covid Race bar chart</h5>
+                <p class="card-text">Select the State and see the race of confirmed Covid-19 cases between its districts</p>
+                <a href="./indiaStateWiseDistrictRaceBarChart/index.html" class="btn btn-primary">Check It Out</a>
+            </div>
+        </div>
+    </section>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="main.ts"></script><!-- CSS only -->
     
-    <div id="raceChart">
-
-    </div>
-    <script src="main.ts"></script>
 </body>
 </html>
