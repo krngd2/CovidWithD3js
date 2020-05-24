@@ -39,18 +39,18 @@ function plotChart(data: []) {
                 // .style("background", color(0))
                 .style("cursor", "pointer")
     svg.call(zoom()
-            .scaleExtent([0.1, 20])  // This control how much you can unzoom (x0.5) and zoom (x20)
+            .scaleExtent([0.1, 80])  // This control how much you can unzoom (x0.5) and zoom (x20)
             .extent([[0, 0], [width, height]])
             .on("zoom", function () {
-            svg.attr("transform", event.transform)
+            select('svg > g').attr("transform", event.transform)
         }))
     svg.append('g')
     const dataNodes = hierarchy(data)
     dataNodes.sum((d) => d['Active Cases_text'])
+                .sort((d) => d['Active Cases_text'])
     
     const packLayout = pack().size([width, height]).padding(1)
-    packLayout(dataNodes)
-    console.log(dataNodes.descendants());
+    packLayout(dataNodes) 
     
 
     const countries = select('svg g')
