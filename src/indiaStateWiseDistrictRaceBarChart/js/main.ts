@@ -124,7 +124,30 @@ function plotChart(data: CovidData[][]) {
             .classed('x-axis', true)
             .style('transform', 'translate(10px, 10px);')
         .call(xAxis)
+    // Tool Tip Implementation
+    const div = select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
 
+    bars.on("mouseover", function(d: CovidData[], index) {
+        div.transition()
+            .duration(200)
+            .style("opacity", .9);
+        div.html("<b>"+ d[0].district + "</b>"+
+                "<br/><b>Confirmed: </b>" + d[0].confirmed +
+                "<br/><b>Recovered:</b> " +
+                "<br/><b>Deaths:</b> " +
+                "<br/><b>Active: </b>")
+            .style("left", (event.pageX) + "px")
+            .style('background', (d) => colorSchema(index))
+            .style("top", (event.pageY - 28) + "px");
+        })
+    .on("mouseout", function(d) {
+        div.transition()
+            .duration(500)
+            .style("opacity", 0);
+    });
+    //-----------------------------------
 
     return (i:  number) => { 
         
