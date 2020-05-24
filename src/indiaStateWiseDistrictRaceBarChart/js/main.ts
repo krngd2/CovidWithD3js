@@ -69,6 +69,7 @@ async function playPlot(date?: string) {
 function plotChart(data: CovidData[][]) {
     const mainSection = select('#raceChart')
     const dateH2 = select('#date')
+    let presentIndex = 0;
     dateH2.text(data[0][0].date)
     mainSection.html('')
     const rankings = data.map((district: CovidData[]) => district[0])
@@ -129,12 +130,12 @@ function plotChart(data: CovidData[][]) {
             .attr("class", "tooltip")
             .style("opacity", 0);
 
-    bars.on("mouseover", function(d: CovidData[], index) {
+    bars.on("mouseover", (d: CovidData[], index) => {
         div.transition()
             .duration(200)
             .style("opacity", .9);
-        div.html("<b>"+ d[0].district + "</b>"+
-                "<br/><b>Confirmed: </b>" + d[0].confirmed +
+        div.html("<b>"+ d[presentIndex].district + "</b>"+
+                "<br/><b>Confirmed: </b>" + d[presentIndex].confirmed +
                 "<br/><b>Recovered:</b> " +
                 "<br/><b>Deaths:</b> " +
                 "<br/><b>Active: </b>")
@@ -150,7 +151,7 @@ function plotChart(data: CovidData[][]) {
     //-----------------------------------
 
     return (i:  number) => {
-
+        presentIndex = i;
         dateH2.text(data[0][i].date)
         const updatedRankings = data.map((district: CovidData[]) => district[i])
                             .sort((a: CovidData, b: CovidData)=>b.confirmed -a.confirmed)
