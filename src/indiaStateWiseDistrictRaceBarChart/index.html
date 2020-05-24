@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telangana Covid Cases</title>
+    <title>Covid-19 Cases in India</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500&display=swap" rel="stylesheet">
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <h3 id="heading">District wise COVID-19 cases by date</h3>
+    <h1 id="heading">District wise COVID-19 cases by date</h1>
     <div class="details">
-        <label for="select_state"> Select State</label>
         <select name="select_state" id="select_state"></select>
         <div>
-            <label for="dateRange" id="date"></label>
-            <input type="range" id="dateRange">
+            <label for="dateRange" id="date">Date</label>
+            <input type="range" id="dateRange" class = "dateRangeClass">
         </div>
         <div>
             <label for="speedRange">Speed</label>
             <input type="range" id="speedRange" min="200" max="2000" step="100" value="800">
         </div>
     </div>
-    
+
     <div id="raceChart">
 
     </div>

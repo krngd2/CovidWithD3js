@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { CovidData } from "../../interfaces/CovidData.interface";
-import { select, timeParse, 
-    scaleLinear, max, schemeTableau10, 
-    scaleOrdinal, axisTop, easeLinear 
+import { select, timeParse,
+    scaleLinear, max, schemeTableau10,
+    scaleOrdinal, axisTop, easeLinear
 } from "d3";
 
 let totalCovidData: any;
@@ -12,7 +12,7 @@ let ticker: number = 800;
 select('#speedRange').on('change', (d, i ,n) => {
     ticker = n[0].value;
     console.log(ticker);
-    
+
 })
 fetch('https://api.covid19india.org/districts_daily.json')
     .then(res => res.json())
@@ -30,7 +30,7 @@ async function adjustData() {
     const selectElement = select('#select_state')
     const selectedState = selectElement.property("value")
     console.log(selectedState);
-    
+
     if (selectedState === '0') return ;
     const covidStateDataObj = totalCovidData[selectedState]
     covidStateData = Object.keys(covidStateDataObj).map(district => {
@@ -47,7 +47,7 @@ async function adjustData() {
     await playPlot()
 
 }
-  
+
 async function playPlot(date?: string) {
     const timeParser = timeParse("%Y-%m-%d")
     if (date) {
@@ -74,7 +74,7 @@ function plotChart(data: CovidData[][]) {
     mainSection.html('')
     const rankings = data.map((district: CovidData[]) => district[0])
                         .sort((a: CovidData,b: CovidData)=>b.confirmed - a.confirmed)
-                        .map(d => d? d.district : '') 
+                        .map(d => d? d.district : '')
     const mainSectionNode: HTMLElement = mainSection.node() as HTMLElement
     // data.sort( (a, b) => b.confirmed - a.confirmed)
     const mainSvg = mainSection.append('svg')
@@ -89,7 +89,7 @@ function plotChart(data: CovidData[][]) {
     const bars = mainSvg
             .append('g')
             .classed('bars', true)
-            .style('transform', 'translate(0px,20px)')  
+            .style('transform', 'translate(0px,20px)')
             .selectAll('g')
             .data(data)
             .enter()
@@ -118,8 +118,8 @@ function plotChart(data: CovidData[][]) {
                 .style('font-size', 14)
                 .html((d) => {
                     return d[0].confirmed + ' ' + d[0].district
-                }) 
-            
+                })
+
     const xAxis = axisTop(xScale)
     mainSvg.append('g')
             .classed('x-axis', true)
@@ -155,10 +155,10 @@ function plotChart(data: CovidData[][]) {
         dateH2.text(data[0][i].date)
         const updatedRankings = data.map((district: CovidData[]) => district[i])
                             .sort((a: CovidData, b: CovidData)=>b.confirmed -a.confirmed)
-                            .map((d: CovidData) => d? d.district : '') 
+                            .map((d: CovidData) => d? d.district : '')
         const newXScale = scaleLinear()
                             .domain([0, max(data.map((d: CovidData[]) => d[i] ? d[i].confirmed : 0)) + 100])
-                            .range([0, mainSectionNode.clientWidth - 100]) 
+                            .range([0, mainSectionNode.clientWidth - 100])
         bars.selectAll('rect')
             .transition()
             .duration(500)
@@ -169,11 +169,11 @@ function plotChart(data: CovidData[][]) {
             .attr('y', (d: CovidData[]) => {
                 return 20 * (d[i] ?  updatedRankings.findIndex((e: string) => e === d[i].district) : mainSectionNode.clientHeight)
             })
-            
+
         bars.selectAll('text')
             .html((d: CovidData[]) => {
                 return (d[i] ? d[i].confirmed : 0) + ' ' + (d[i] ?  d[i].district : '')
-            }) 
+            })
             .transition()
             .duration(500)
             .ease(easeLinear)
@@ -181,7 +181,7 @@ function plotChart(data: CovidData[][]) {
             .attr('y', (d: CovidData[]) => {
                 return 20 * (d[i] ?  updatedRankings.findIndex((e: string) => e === d[i].district) : mainSectionNode.clientHeight) + 15
             })
-            
+
         select('g.x-axis').call(axisTop(newXScale))
     }
 }
@@ -207,8 +207,8 @@ function intiDateSlider(dates: string[]) {
             })
 }
 
-function disableEnableOptions(enable:boolean) { 
+function disableEnableOptions(enable:boolean) {
     select('#dateRange').attr('disabled', enable ? null: true);
-    select('#select_state').attr('disabled', enable ? null: true); 
+    select('#select_state').attr('disabled', enable ? null: true);
     select('#speedRange').attr('disabled', enable ? null: true)
 }
