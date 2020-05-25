@@ -11,7 +11,7 @@ let updateChart: Function;
 let ticker: number = 800;
 select('#speedRange').on('change', (d, i ,n) => {
     ticker = n[0].value;
-    console.log(ticker);
+    // console.log(ticker);
 
 })
 
@@ -60,7 +60,7 @@ async function adjustData() {
 
     const selectElement = select('#select_state')
     const selectedState = selectElement.property("value")
-    console.log(selectedState);
+    // console.log(selectedState);
 
     if (selectedState === '0') return ;
     const covidStateDataObj = totalCovidData[selectedState]
@@ -70,7 +70,7 @@ async function adjustData() {
             return e
         })
     })
-    console.log(covidStateData)
+    // console.log(covidStateData)
     const dates = covidStateData
                     .map(d => d.map(e => e.date))
                     .flat(Infinity);
