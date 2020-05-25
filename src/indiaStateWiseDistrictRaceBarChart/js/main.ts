@@ -14,16 +14,47 @@ select('#speedRange').on('change', (d, i ,n) => {
     console.log(ticker);
 
 })
-fetch('https://api.covid19india.org/districts_daily.json')
+
+
+
+fetch('https://api.covid19india.org/districts_daily.json', addData)
     .then(res => res.json())
     .then((data: any) => {
-        totalCovidData = data.districtsDaily;
+        totalCovidData = addData(data.districtsDaily)
         makeStatesDropDown(Object.keys(totalCovidData))
         // adjustData()
         adjustData()
     })
     .catch(console.error)
 
+
+function addData(data){
+    let India = {}
+    for (let p in data) {
+        if( data.hasOwnProperty(p) ) {
+          India[p] = []
+          for (let q in data[p]){
+              for(let i = 0; i < data[p][q].length; i++){
+                  if (India[p].length < data[p][q].length){
+                    India[p].push(data[p][q][i])
+                  }
+                  else{
+                      for ( let j in India[p] ){
+                        if (India[p][j].date === data[p][q][i].date){
+                            India[p][j].active += data[p][q][i].active
+                            India[p][j].confirmed += data[p][q][i].confirmed
+                            India[p][j].recovered += data[p][q][i].recovered
+                            India[p][j].deceased += data[p][q][i].deceased
+                        }
+                      }
+                  }
+              }
+          }
+        }
+    }
+    data["All-India"] = India
+    return data
+}
 
 async function adjustData() {
 
@@ -39,6 +70,7 @@ async function adjustData() {
             return e
         })
     })
+    console.log(covidStateData)
     const dates = covidStateData
                     .map(d => d.map(e => e.date))
                     .flat(Infinity);
@@ -136,9 +168,9 @@ function plotChart(data: CovidData[][]) {
             .style("opacity", .9);
         div.html("<b>"+ d[presentIndex].district + "</b>"+
                 "<br/><b>Confirmed: </b>" + d[presentIndex].confirmed +
-                "<br/><b>Recovered:</b> " +
-                "<br/><b>Deaths:</b> " +
-                "<br/><b>Active: </b>")
+                "<br/><b>Recovered:</b> " +d[presentIndex].recovered+
+                "<br/><b>Deaths:</b> " +d[presentIndex].deceased+
+                "<br/><b>Active: </b>" + d[presentIndex].active)
             .style("left", (event.pageX) + "px")
             .style('background', (d) => colorSchema(index))
             .style("top", (event.pageY - 28) + "px");
@@ -189,6 +221,7 @@ function plotChart(data: CovidData[][]) {
 function makeStatesDropDown(data: string[]) {
     const selectElement = select('#select_state')
     const optionsArray  = data.map(d => `<option value='${d}' >${d}</option>`)
+    optionsArray.unshift(optionsArray.pop())
     optionsArray.unshift(`<option value='0' disabled selected>Select a State</option>`)
     selectElement.html(optionsArray.join(''))
     selectElement.on('change', adjustData)
