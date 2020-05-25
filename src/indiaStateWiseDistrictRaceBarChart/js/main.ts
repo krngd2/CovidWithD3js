@@ -6,6 +6,7 @@ import { select, timeParse,
 } from "d3";
 
 let totalCovidData: any;
+let totalCovidDataState: any;
 let covidStateData: CovidData[][] = []
 let updateChart: Function;
 let ticker: number = 800;
@@ -16,8 +17,49 @@ select('#speedRange').on('change', (d, i ,n) => {
 })
 
 
+const stateCodes = {
+    'un': "State Unassigned",
+    'an': "Andaman and Nicobar Islands",
+    'ap': "Andhra Pradesh",
+    'ar': "Arunachal Pradesh",
+    'as': "Assam",
+    'br': "Bihar",
+    'ch': "Chandigarh",
+    'ct': "Chhattisgarh",
+    'dl': "Delhi",
+    'dn': "Dadra and Nagar Haveli and Daman and Diu",
+    'ga': "Goa",
+    'gj': "Gujarat",
+    'hp': "Himachal Pradesh",
+    'hr': "Haryana",
+    'jh': "Jharkhand",
+    'jk': "Jammu and Kashmir",
+    'ka': "Karnataka",
+    'kl': "Kerala",
+    'la': "Ladakh",
+    'ld': "Lakshadweep",
+    'mh': "Maharashtra",
+    'ml': "Meghalaya",
+    'mn': "Manipur",
+    'mp': "Madhya Pradesh",
+    'mz': "Mizoram",
+    'nl': "Nagaland",
+    'or': "Odisha",
+    'pb': "Punjab",
+    'py': "Puducherry",
+    'rj': "Rajasthan",
+    'sk': "Sikkim",
+    'tg': "Telangana",
+    'tn': "Tamil Nadu",
+    'tr': "Tripura",
+    'up': "Uttar Pradesh",
+    'ut': "Uttarakhand",
+    'wb': "West Bengal",
+}
 
-fetch('https://api.covid19india.org/districts_daily.json', addData)
+
+
+fetch('https://api.covid19india.org/districts_daily.json')
     .then(res => res.json())
     .then((data: any) => {
         totalCovidData = addData(data.districtsDaily)
@@ -28,30 +70,65 @@ fetch('https://api.covid19india.org/districts_daily.json', addData)
     .catch(console.error)
 
 
+function convertDate(dateString){
+    const months = {
+        'Jan' : '01',
+        'Feb' : '02',
+        'Mar' : '03',
+        'Apr' : '04',
+        'May' : '05',
+        'Jun' : '06',
+        'Jul' : '07',
+        'Aug' : '08',
+        'Sep' : '09',
+        'Oct' : '10',
+        'Nov' : '11',
+        'Dec' : '12'
+    }
+    let dateEle = dateString.split('-')
+    let corrDateForm = "20" + dateEle[2] + "-" + months[dateEle[1]] + "-" + dateEle[0]
+
+    return corrDateForm
+}
+
 function addData(data){
     let India = {}
-    for (let p in data) {
-        if( data.hasOwnProperty(p) ) {
-          India[p] = []
-          for (let q in data[p]){
-              for(let i = 0; i < data[p][q].length; i++){
-                  if (India[p].length < data[p][q].length){
-                    India[p].push(data[p][q][i])
-                  }
-                  else{
-                      for ( let j in India[p] ){
-                        if (India[p][j].date === data[p][q][i].date){
-                            India[p][j].active += data[p][q][i].active
-                            India[p][j].confirmed += data[p][q][i].confirmed
-                            India[p][j].recovered += data[p][q][i].recovered
-                            India[p][j].deceased += data[p][q][i].deceased
-                        }
-                      }
-                  }
-              }
-          }
-        }
-    }
+    fetch('https://api.covid19india.org/states_daily.json')
+        .then(res => res.json())
+        .then((data: any) => {
+            totalCovidDataState = data.states_daily
+            for(let i = 0 ; i < 1; i = i + 3){
+                for (let p in totalCovidDataState[i]){
+                    if (p in stateCodes){
+                        India[stateCodes[p]] = []
+                    }
+                }
+            }
+            for(let i = 0 ; i < totalCovidDataState.length; i = i + 3){
+                for (let p in totalCovidDataState[i]){
+                    if (p in stateCodes ){
+                    let obj = {
+                        confirmed: +totalCovidDataState[i][p],
+                        recovered: +totalCovidDataState[i+1][p],
+                        deceased: +totalCovidDataState[i+2][p],
+                        date: convertDate(totalCovidDataState[i]['date'])
+                    }
+                    India[stateCodes[p]].push(obj)
+                    }
+                }
+            }
+            for(let p in India){
+                for(let j in India[p]){
+                    if(+j > 0){
+                        India[p][j].confirmed += India[p][+j-1].confirmed
+                        India[p][j].recovered += India[p][+j-1].recovered
+                        India[p][j].deceased += India[p][+j-1].deceased
+                    }
+                }
+            }
+            console.log(India)
+        })
+        .catch(console.error)
     data["All-India"] = India
     return data
 }
@@ -169,8 +246,7 @@ function plotChart(data: CovidData[][]) {
         div.html("<b>"+ d[presentIndex].district + "</b>"+
                 "<br/><b>Confirmed: </b>" + d[presentIndex].confirmed +
                 "<br/><b>Recovered:</b> " +d[presentIndex].recovered+
-                "<br/><b>Deaths:</b> " +d[presentIndex].deceased+
-                "<br/><b>Active: </b>" + d[presentIndex].active)
+                "<br/><b>Deaths:</b> " +d[presentIndex].deceased)
             .style("left", (event.pageX) + "px")
             .style('background', (d) => colorSchema(index))
             .style("top", (event.pageY - 28) + "px");
