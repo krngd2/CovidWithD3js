@@ -20,25 +20,26 @@ select('#speedRange').on('change', (d, i ,n) => {
 fetch('https://api.covid19india.org/districts_daily.json', addData)
     .then(res => res.json())
     .then((data: any) => {
-        totalCovidData = data.districtsDaily;
-        totalCovidData = addData(totalCovidData)
+        totalCovidData = addData(data.districtsDaily)
         makeStatesDropDown(Object.keys(totalCovidData))
         // adjustData()
         adjustData()
     })
     .catch(console.error)
+
+
 function addData(data){
-    var India = {}
-    for (var p in data) {
+    let India = {}
+    for (let p in data) {
         if( data.hasOwnProperty(p) ) {
           India[p] = []
-          for (var q in data[p]){
-              for(var i = 0; i < data[p][q].length; i++){
+          for (let q in data[p]){
+              for(let i = 0; i < data[p][q].length; i++){
                   if (India[p].length < data[p][q].length){
                     India[p].push(data[p][q][i])
                   }
                   else{
-                      for ( var j in India[p] ){
+                      for ( let j in India[p] ){
                         if (India[p][j].date === data[p][q][i].date){
                             India[p][j].active += data[p][q][i].active
                             India[p][j].confirmed += data[p][q][i].confirmed
@@ -51,8 +52,7 @@ function addData(data){
           }
         }
     }
-    data["India"] = India
-    console.log((India))
+    data["All-India"] = India
     return data
 }
 
@@ -221,6 +221,7 @@ function plotChart(data: CovidData[][]) {
 function makeStatesDropDown(data: string[]) {
     const selectElement = select('#select_state')
     const optionsArray  = data.map(d => `<option value='${d}' >${d}</option>`)
+    optionsArray.unshift(optionsArray.pop())
     optionsArray.unshift(`<option value='0' disabled selected>Select a State</option>`)
     selectElement.html(optionsArray.join(''))
     selectElement.on('change', adjustData)
