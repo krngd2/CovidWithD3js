@@ -185,6 +185,13 @@ function plotChart(data: CovidData[][]) {
     let presentDate = covidStateAllDates[0];
     const dateH2 = select('#date')
     dateH2.text(covidStateAllDates[0])
+    const totalCases = select('#totalCases')
+    let confirmedCases = 0;
+    data.forEach((value) => {
+        let cases = value[covidStateAllDates[0]]?.confirmed
+        confirmedCases = confirmedCases + (isNaN(cases) ? 0 : cases);
+    });
+    totalCases.text(confirmedCases);
     mainSection.html('')
     const rankings = data.map((district: CovidData[]) => district[covidStateAllDates[0]])
         .sort((a: CovidData, b: CovidData) => b.confirmed - a.confirmed)
@@ -277,6 +284,12 @@ function plotChart(data: CovidData[][]) {
         const newXScale = scaleLinear()
             .domain([0, max(data.map((d: CovidData[]) => d[date]?.confirmed ?? 0)) + 100])
             .range([0, mainSectionNode.clientWidth - 100])
+        let confirmedCases = 0;
+        data.forEach((value) => {
+            let cases = value[date]?.confirmed
+            confirmedCases = confirmedCases + (isNaN(cases) ? 0 : cases);
+        });
+        totalCases.text(confirmedCases);
         bars.selectAll('rect')
             .transition()
             .duration(500)
