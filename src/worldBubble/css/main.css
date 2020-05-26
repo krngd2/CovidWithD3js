@@ -1,3 +1,11 @@
+
+
+body {
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Exo 2', sans-serif;
+}
+
 #chartbox {
     height: 90vh;
     width: 100vw;
@@ -6,10 +14,10 @@
 div.tooltip {
     position: absolute;
     text-align: center;
-    width: 150px;
-    height: 150px;
+    width: 70px;
+    height: 70px;
     padding: 2px;
-    font: 12px sans-serif;
+    font: 6px sans-serif;
     border: 0px;
     border-radius: 8px;
     pointer-events: none;
