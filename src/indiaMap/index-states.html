@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- India State Map  -->
+    <title>India Map</title>
+
+    <!--  Scripts  -->
+    <script type="text/javascript" src="js/d3.min.js"></script>
+    <script type="text/javascript" src="js/d3.geo.min.js"></script>
+
+    <!--  Styles  -->
+    <link type="text/css" rel="stylesheet" href="css/index.css" />
+    <style type="text/css">
+        svg {
+            background: #eee;
+        }
+
+        #india {
+            fill: #fff;
+            opacity: 1;
+            stroke: #000000;
+            stroke-width: .6;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chart"></div>
+    <script type="text/javascript">
+        var w = 600;
+        var h = 650;
+        var proj = d3.geo.mercator();
+        var path = d3.geo.path().projection(proj);
+        var t = proj.translate(); // the projection's default translation
+        var s = proj.scale() // the projection's default scale
+
+        var svg = d3.select("#chart")
+            .append("svg:svg")
+            .attr("width", w)
+            .attr("height", h)
+            .call(initialize);
+
+        var map = svg.append("svg:g")
+
+        var india = map.append("svg:g")
+            .attr("id", "india");
+        let datesMap = new Map()
+        d3.json("https://api.covid19india.org/states_daily.json", (response) => {
+            for (i = 0; i < response.states_daily.length; i++) {
+                datesMap.set(response.states_daily[i].date+","+response.states_daily[i].status, response.states_daily[i]);
+            }
+            console.log(datesMap);
+        });
+        d3.json("data/states_india.json", function (data) {
+            india.selectAll("path").data(data.features)
+                .enter()
+                .append('path')
+                .attr("class", "subunit")
+                .attr("d", path)
+                .style("stroke", "black")
+                .style("opacity", "1")
+                .style("stroke-width", "1px");
+        });
+
+        function initialize() {
+            proj.scale(6700);
+            proj.translate([-1240, 750]);
+            // proj.fitExtent([[20, 20], [940, 480]], nj);
+        }
+        // https://api.covid19india.org/state_district_wise.json
+        // https://covid-19india-api.herokuapp.com/v2.0/state_data
+    </script>
+</body>
+
+</html>

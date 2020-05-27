@@ -13,7 +13,7 @@ body {
     width: 100%;
 }
 .x-axis {
-    transform: translate(10px, 10px);
+    transform: translate(200px, 10px);
 }
 
 select {
@@ -36,7 +36,7 @@ input[type=range] {
     position: relative;
     margin-right: 5em;
   }
-  input[type=range]::-webkit-slider-runnable-track {
+input[type=range]::-webkit-slider-runnable-track {
     width: 10em;
     height: 2px;
     margin-bottom:.1em;
@@ -44,7 +44,7 @@ input[type=range] {
     background-color: #eee;
     border: 2px solid #ccc;
   }
-  input[type=range]::-webkit-slider-thumb {
+input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     border: none;
     height: 12px;
@@ -54,16 +54,22 @@ input[type=range] {
     border: 2px solid #515151;
     margin-top: -5px;
     cursor: pointer
-  }
+}
 
 .details {
     margin: 2rem;
 
 }
-.details div {
-    display: inline-block;
-}
 
+.details .date-div,.details .ticker-div {
+    width: 100%;
+    text-align: center;
+    margin-top: 1rem;
+}
+.date-div label {
+    font-size: 26px;
+    font-weight: 400;
+}
 div.tooltip {
     position: absolute;
     text-align: center;
