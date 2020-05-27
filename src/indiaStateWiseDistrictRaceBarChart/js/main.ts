@@ -4,154 +4,37 @@ import {
     select, timeParse,
     scaleLinear, max, schemeTableau10,
     scaleOrdinal, axisTop, easeLinear
-} from "d3";
+} from "d3"; 
+import { dropdownInitializer } from "./initializers/dropdown.initializer";
+import { getStatesData, addIndiaData } from "./data";
+import { disableEnableOptions } from "./helpers/disableEnableOptions";
+import { dateSliderInitializer } from "./initializers/dateSlider.initializer";
+import { convertCovidObjToArray } from "./helpers/convertObjToArray";
 
 let totalCovidData: any;
-let totalCovidDataState: any;
 let covidStateData: CovidData[][] = []
 let covidStateAllDates: string[]
 let updateChart: Function;
 let ticker: number = 800;
+
 select('#speedRange').on('change', (d, i, n) => {
     ticker = Math.abs(n[0].value);
 })
 
-
-const stateCodes = {
-    'un': "State Unassigned",
-    'an': "Andaman and Nicobar Islands",
-    'ap': "Andhra Pradesh",
-    'ar': "Arunachal Pradesh",
-    'as': "Assam",
-    'br': "Bihar",
-    'ch': "Chandigarh",
-    'ct': "Chhattisgarh",
-    'dl': "Delhi",
-    'dn': "Dadra and Nagar Haveli and Daman and Diu",
-    'ga': "Goa",
-    'gj': "Gujarat",
-    'hp': "Himachal Pradesh",
-    'hr': "Haryana",
-    'jh': "Jharkhand",
-    'jk': "Jammu and Kashmir",
-    'ka': "Karnataka",
-    'kl': "Kerala",
-    'la': "Ladakh",
-    'ld': "Lakshadweep",
-    'mh': "Maharashtra",
-    'ml': "Meghalaya",
-    'mn': "Manipur",
-    'mp': "Madhya Pradesh",
-    'mz': "Mizoram",
-    'nl': "Nagaland",
-    'or': "Odisha",
-    'pb': "Punjab",
-    'py': "Puducherry",
-    'rj': "Rajasthan",
-    'sk': "Sikkim",
-    'tg': "Telangana",
-    'tn': "Tamil Nadu",
-    'tr': "Tripura",
-    'up': "Uttar Pradesh",
-    'ut': "Uttarakhand",
-    'wb': "West Bengal",
-}
-
-
-
-fetch('https://api.covid19india.org/districts_daily.json')
-    .then(res => res.json())
-    .then((data: any) => {
-        totalCovidData = addIndiaData(data.districtsDaily)
-        makeStatesDropDown(Object.keys(totalCovidData))
-        // adjustData()
-        adjustData()
-    })
-    .catch(console.error)
-
-
-function convertDate(dateString){
-    const months = {
-        'Jan' : '01',
-        'Feb' : '02',
-        'Mar' : '03',
-        'Apr' : '04',
-        'May' : '05',
-        'Jun' : '06',
-        'Jul' : '07',
-        'Aug' : '08',
-        'Sep' : '09',
-        'Oct' : '10',
-        'Nov' : '11',
-        'Dec' : '12'
-    }
-    let dateEle = dateString.split('-')
-    let corrDateForm = "20" + dateEle[2] + "-" + months[dateEle[1]] + "-" + dateEle[0]
-
-    return corrDateForm
-}
-
-function addIndiaData(data){
-    let India = {}
-    fetch('https://api.covid19india.org/states_daily.json')
-        .then(res => res.json())
-        .then((data: any) => {
-            totalCovidDataState = data.states_daily
-            for(let i = 0 ; i < 1; i = i + 3){
-                for (let p in totalCovidDataState[i]){
-                    if (p in stateCodes){
-                        India[stateCodes[p]] = []
-                    }
-                }
-            }
-            for(let i = 0 ; i < totalCovidDataState.length; i = i + 3){
-                for (let p in totalCovidDataState[i]){
-                    if (p in stateCodes ){
-                    let obj = {
-                        confirmed: +totalCovidDataState[i][p],
-                        recovered: +totalCovidDataState[i+1][p],
-                        deceased: +totalCovidDataState[i+2][p],
-                        date: convertDate(totalCovidDataState[i]['date'])
-                    }
-                    India[stateCodes[p]].push(obj)
-                    }
-                }
-            }
-            for(let p in India){
-                for(let j in India[p]){
-                    if(+j > 0){
-                        India[p][j].confirmed += India[p][+j-1].confirmed
-                        India[p][j].recovered += India[p][+j-1].recovered
-                        India[p][j].deceased += India[p][+j-1].deceased
-                    }
-                }
-            }
-            console.log(India)
-        })
-        .catch(console.error)
-    data["All-India"] = India
-    return data
-}
+getStatesData().then(async (data) => {
+    totalCovidData = await addIndiaData(data.districtsDaily)
+    dropdownInitializer(Object.keys(totalCovidData), adjustData)
+    adjustData()
+})
 
 async function adjustData() {
-
     const selectElement = select('#select_state')
-    const selectedState = selectElement.property("value")
-    // console.log(selectedState);
-    covidStateData = []
-    if (selectedState === '0') return;
-    const covidStateDataObj = totalCovidData[selectedState]
-    Object.keys(covidStateDataObj).forEach((district, index) => {
-        covidStateDataObj[district].forEach((e: any) => {
-            e.district = district
-            covidStateData[index] = {...covidStateData[index]} 
-            covidStateData[index][e.date] = e
-        })
-    })
+    const selectedState = selectElement.property("value") 
+    if (selectedState === '0') return; 
+    covidStateData = convertCovidObjToArray(totalCovidData[selectedState])
     console.log(covidStateData)
     updateChart = plotChart(covidStateData)
     await playPlot()
-
 }
 
 async function playPlot(date?: string) {
@@ -178,7 +61,7 @@ function plotChart(data: CovidData[][]) {
         const dates = data.map(d => Object.keys(d))
                     .flat(Infinity);
         covidStateAllDates = dates.filter((v,i) => dates.indexOf(v) === i)
-        intiDateSlider(covidStateAllDates)
+        dateSliderInitializer(covidStateAllDates, playPlot)
     })()
     let presentDate = covidStateAllDates[0];
     const dateH2 = select('#date')
@@ -187,8 +70,7 @@ function plotChart(data: CovidData[][]) {
     mainSection.html('')
     const rankings = data.map((district: CovidData[]) => district[covidStateAllDates[0]])
         .sort((a: CovidData, b: CovidData) => b.confirmed - a.confirmed)
-        .map(d => d ? d.district : '').filter(v => v !== "")
-    console.log(covidStateAllDates[0], rankings);
+        .map(d => d ? d.district : '').filter(v => v !== "") 
         
     const mainSectionNode: HTMLElement = mainSection.node() as HTMLElement
     // data.sort( (a, b) => b.confirmed - a.confirmed)
@@ -279,7 +161,7 @@ function plotChart(data: CovidData[][]) {
             .range([0, mainSectionNode.clientWidth - 100])
         bars.selectAll('rect')
             .transition()
-            .duration(500)
+            .duration(ticker / 1.2)
             .ease(easeLinear)
             .attr('width', (d: CovidData[]) => {
                 return newXScale(d[date]?.confirmed ?? 0)
@@ -297,7 +179,7 @@ function plotChart(data: CovidData[][]) {
                 return (d[date] ? d[date].confirmed : 0) + ' ' + (d[date] ? d[date].district : '')
             })
             .transition()
-            .duration(500)
+            .duration(ticker / 1.2)
             .ease(easeLinear)
             .attr('x', (d: CovidData[]) => newXScale(d[date] ? d[date].confirmed : 0) + 20)
             .attr('y', (d: CovidData[]) => {
@@ -307,35 +189,11 @@ function plotChart(data: CovidData[][]) {
                 return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district)??0) : mainSectionNode.clientHeight) + 15
             })
 
-        select('g.x-axis').call(axisTop(newXScale))
+        select('g.x-axis')
+            .transition()
+            .duration(ticker / 1.2)
+            .ease(easeLinear)
+            .call(axisTop(newXScale))
     }
-}
+} 
 
-function makeStatesDropDown(data: string[]) {
-    const selectElement = select('#select_state')
-    const optionsArray = data.map(d => `<option value='${d}' >${d}</option>`)
-    optionsArray.unshift(optionsArray.pop())
-    optionsArray.unshift(`<option value='0' disabled selected>Select a State</option>`)
-    selectElement.html(optionsArray.join(''))
-    selectElement.on('change', adjustData)
-}
-
-function intiDateSlider(dates: string[]) {
-    const timeParser = timeParse("%Y-%m-%d")
-    const dateObjects = dates.map(d => timeParser(d).getTime());
-    dateObjects.sort()
-    select('#dateRange')
-        .attr('min', dateObjects[0] / 1000)
-        .attr('max', dateObjects[dateObjects.length - 1] / 1000)
-        .attr('step', 86400)
-        .on('input', async (d, i, n: HTMLInputElement[]) => {
-            const idate = new Date(Number(n[0].value + '000'))
-            await playPlot(`${idate.getFullYear()}-${idate.getMonth()+1 < 10 ? '0' + (idate.getMonth()+1): idate.getMonth()}-${idate.getDate() < 10 ? '0' + idate.getDate() : idate.getDate()}`);
-        })
-}
-
-function disableEnableOptions(enable: boolean) {
-    select('#dateRange').attr('disabled', enable ? null : true);
-    select('#select_state').attr('disabled', enable ? null : true);
-    select('#speedRange').attr('disabled', enable ? null : true)
-}
