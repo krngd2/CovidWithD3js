@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,21 +9,31 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <link rel="stylesheet" href="css/main.css">
 </head>
+
 <body>
     <h1 id="heading">Covid India Racing bar chart</h1>
     <div class="details">
-        <div class="date-div">
+        <!-- <div class="date-div">
             <label for="dateRange" id="date">Date</label>
-            <input type="range" id="dateRange" class = "dateRangeClass">
-        </div>
+            <input type="range" id="dateRange" class="dateRangeClass">
+        </div> -->
         <div class="ticker-div">
             <label for="speedRange">Ticker Speed</label>
             <input type="range" id="speedRange" min="-2000" max="-200" step="100" value="-800">
         </div>
         <select name="select_state" id="select_state">
         </select>
+        <div class="date-big">
+            <label id="date-big">Date</label>
+        </div>
+        <div class="date-big-picker">
+            <input type="range" id="dateRange" class="dateRangeClass">
+        </div>
+        <div class="total-cases">
+            <label for="totalCases">Total Cases -</label>
+            <label id="totalCases">0</label>
+        </div>
     </div>
-
     <div id="raceChart">
 
     </div>
@@ -33,4 +44,5 @@
         <li><a href="https://github.com/dhruvkp090">Dhruv</a></li>
     </ul>
 </body>
+
 </html>

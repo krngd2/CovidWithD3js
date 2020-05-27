@@ -32,7 +32,6 @@ async function adjustData() {
     const selectedState = selectElement.property("value") 
     if (selectedState === '0') return; 
     covidStateData = convertCovidObjToArray(totalCovidData[selectedState])
-    console.log(covidStateData)
     updateChart = plotChart(covidStateData)
     await playPlot()
 }
@@ -65,8 +64,16 @@ function plotChart(data: CovidData[][]) {
     })()
     let presentDate = covidStateAllDates[0];
     const dateH2 = select('#date')
-    
-    dateH2.text(covidStateAllDates[0])
+    const dateBig=select('#date-big')
+    dateH2.text(convertDateFormat(covidStateAllDates[0]))
+    dateBig.text(convertDateFormat(covidStateAllDates[0]))
+    const totalCases = select('#totalCases')
+    let confirmedCases = 0;
+    data.forEach((value) => {
+        let cases = value[covidStateAllDates[0]]?.confirmed
+        confirmedCases = confirmedCases + (isNaN(cases) ? 0 : cases);
+    });
+    totalCases.text(confirmedCases);
     mainSection.html('')
     const rankings = data.map((district: CovidData[]) => district[covidStateAllDates[0]])
         .sort((a: CovidData, b: CovidData) => b.confirmed - a.confirmed)
@@ -79,10 +86,11 @@ function plotChart(data: CovidData[][]) {
         .attr('height', mainSectionNode.clientHeight)
         .append('g')
         .style('transform', 'translate(0px,10px)')
+    const maxDistrictLength = 200;
 
     const xScale = scaleLinear()
         .domain([0, max(data.map((d) => d[covidStateAllDates[0]]?.confirmed ? d[covidStateAllDates[0]]?.confirmed : 0)) + 100])
-        .range([0, mainSectionNode.clientWidth - 100])
+        .range([0, mainSectionNode.clientWidth - 100 - maxDistrictLength]);
 
     const colorSchema = scaleOrdinal().range(schemeTableau10)
     const bars = mainSvg
@@ -94,9 +102,9 @@ function plotChart(data: CovidData[][]) {
         .enter()
         .append('g')
         .attr('class', d => d[covidStateAllDates[0]]?.district)
-
+    //rectangles
     bars.append('rect')
-        .attr('x', 10)
+        .attr('x', maxDistrictLength)
         .attr('y', (d) => {
             return 20 * (d[covidStateAllDates[0]] ? rankings.findIndex((e: string) => e === d[covidStateAllDates[0]]?.district) : 0)
         })
@@ -106,18 +114,30 @@ function plotChart(data: CovidData[][]) {
         })
         .style('stroke', (d, i: number) => colorSchema(i))
         .style('fill', (d, i: number) => colorSchema(i))
-
+    //counts
     bars.append('text')
+        .attr('class', 'count')
         .attr('x', (d) => {
-            return xScale(d[covidStateAllDates[0]]?.confirmed ?? 0) + 20
+            return xScale(d[covidStateAllDates[0]]?.confirmed ?? 0) + 10 + maxDistrictLength
         })
         .attr('y', (d) => {
             return 20 * (d[covidStateAllDates[0]] ? rankings.findIndex((e: string) => e === d[covidStateAllDates[0]]?.district) : 0) + 15
         })
         .style('font-size', 14)
-        .attr('text-anchor', 'right')
         .html((d) => {
-            return (d[covidStateAllDates[0]]?.confirmed?? '') + ' ' + (d[covidStateAllDates[0]]?.district ?? '')
+            return (d[covidStateAllDates[0]]?.confirmed ?? '')
+        })
+    //district names
+    bars.append('text')
+        .attr('class', 'districtName')
+        .attr('x', maxDistrictLength - 10)
+        .attr('y', (d) => {
+            return 20 * (d[covidStateAllDates[0]] ? rankings.findIndex((e: string) => e === d[covidStateAllDates[0]]?.district) : 0) + 15
+        })
+        .attr("text-anchor", "end")
+        .style('font-size', 14)
+        .html((d) => {
+            return (d[covidStateAllDates[0]]?.district ?? '')
         })
 
     const xAxis = axisTop(xScale)
@@ -152,13 +172,20 @@ function plotChart(data: CovidData[][]) {
 
     return (date: string) => {
         presentDate = date;
-        dateH2.text(date)
+        dateH2.text(convertDateFormat(presentDate))
+        dateBig.text(convertDateFormat(presentDate))
         const updatedRankings = data.map((district: CovidData[]) => district[date])
             .sort((a: CovidData, b: CovidData) => b.confirmed - a.confirmed)
             .map((d: CovidData) => d ? d.district : '') 
         const newXScale = scaleLinear()
             .domain([0, max(data.map((d: CovidData[]) => d[date]?.confirmed ?? 0)) + 100])
-            .range([0, mainSectionNode.clientWidth - 100])
+            .range([0, mainSectionNode.clientWidth - 100 - maxDistrictLength])
+        let confirmedCases = 0;
+        data.forEach((value) => {
+            let cases = value[date]?.confirmed
+            confirmedCases = confirmedCases + (isNaN(cases) ? 0 : cases);
+        });
+        totalCases.text(confirmedCases);
         bars.selectAll('rect')
             .transition()
             .duration(ticker / 1.2)
@@ -173,27 +200,36 @@ function plotChart(data: CovidData[][]) {
                 }
                 return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight)
             })
-
-        bars.selectAll('text')
+        bars.selectAll('.count')
             .html((d: CovidData[]) => {
-                return (d[date] ? d[date].confirmed : 0) + ' ' + (d[date] ? d[date].district : '')
+                return (d[date] ? d[date].confirmed : 0)
             })
             .transition()
             .duration(ticker / 1.2)
             .ease(easeLinear)
-            .attr('x', (d: CovidData[]) => newXScale(d[date] ? d[date].confirmed : 0) + 20)
+            .attr('x', (d: CovidData[]) => newXScale(d[date] ? d[date].confirmed : 0) + 10 + maxDistrictLength)
             .attr('y', (d: CovidData[]) => {
-                if (d[date]?.confirmed === 0) {
-                    return mainSectionNode.clientHeight
-                }
-                return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district)??0) : mainSectionNode.clientHeight) + 15
+                return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight) + 15
             })
-
-        select('g.x-axis')
+        bars.selectAll('.districtName')
+            .html((d: CovidData[]) => {
+                return (d[date] ? d[date].district : '')
+            })
             .transition()
-            .duration(ticker / 1.2)
+            .duration(500)
             .ease(easeLinear)
-            .call(axisTop(newXScale))
+            .attr('x', maxDistrictLength - 10)
+            .attr('y', (d: CovidData[]) => {
+                return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight) + 15
+            })
+        select('g.x-axis').call(axisTop(newXScale))
     }
 } 
 
+function convertDateFormat(inputDate){
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+    let date=new Date(inputDate);
+    return date.getDate()+'-'+monthNames[date.getMonth()]+'-'+date.getFullYear();
+}
