@@ -32,7 +32,6 @@ async function adjustData() {
     const selectedState = selectElement.property("value") 
     if (selectedState === '0') return; 
     covidStateData = convertCovidObjToArray(totalCovidData[selectedState])
-    console.log(covidStateData)
     updateChart = plotChart(covidStateData)
     await playPlot()
 }
@@ -65,8 +64,9 @@ function plotChart(data: CovidData[][]) {
     })()
     let presentDate = covidStateAllDates[0];
     const dateH2 = select('#date')
-    
-    dateH2.text(covidStateAllDates[0])
+    const dateBig=select('#date-big')
+    dateH2.text(convertDateFormat(covidStateAllDates[0]))
+    dateBig.text(convertDateFormat(covidStateAllDates[0]))
     const totalCases = select('#totalCases')
     let confirmedCases = 0;
     data.forEach((value) => {
@@ -172,7 +172,8 @@ function plotChart(data: CovidData[][]) {
 
     return (date: string) => {
         presentDate = date;
-        dateH2.text(date)
+        dateH2.text(convertDateFormat(presentDate))
+        dateBig.text(convertDateFormat(presentDate))
         const updatedRankings = data.map((district: CovidData[]) => district[date])
             .sort((a: CovidData, b: CovidData) => b.confirmed - a.confirmed)
             .map((d: CovidData) => d ? d.district : '') 
@@ -225,3 +226,10 @@ function plotChart(data: CovidData[][]) {
     }
 } 
 
+function convertDateFormat(inputDate){
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+    let date=new Date(inputDate);
+    return date.getDate()+'-'+monthNames[date.getMonth()]+'-'+date.getFullYear();
+}
