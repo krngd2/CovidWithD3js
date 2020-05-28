@@ -209,7 +209,10 @@ function plotChart(data: CovidData[][]) {
             .ease(easeLinear)
             .attr('x', (d: CovidData[]) => newXScale(d[date] ? d[date].confirmed : 0) + 10 + maxDistrictLength)
             .attr('y', (d: CovidData[]) => {
-                return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight) + 15
+                if (d[date]?.confirmed === 0) {
+                    return mainSectionNode.clientHeight
+                }
+                return 20 * (d[date] ?  (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight) + 15
             })
         bars.selectAll('.districtName')
             .html((d: CovidData[]) => {
@@ -219,7 +222,10 @@ function plotChart(data: CovidData[][]) {
             .duration(500)
             .ease(easeLinear)
             .attr('x', maxDistrictLength - 10)
-            .attr('y', (d: CovidData[]) => {
+            .attr('y', (d: CovidData[]) => { 
+                if (d[date]?.confirmed === 0) {
+                    return mainSectionNode.clientHeight
+                }
                 return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight) + 15
             })
         select('g.x-axis').call(axisTop(newXScale))
