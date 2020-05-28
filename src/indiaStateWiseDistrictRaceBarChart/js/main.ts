@@ -10,6 +10,7 @@ import { getStatesData, addIndiaData } from "./data";
 import { disableEnableOptions } from "./helpers/disableEnableOptions";
 import { dateSliderInitializer } from "./initializers/dateSlider.initializer";
 import { convertCovidObjToArray } from "./helpers/convertObjToArray";
+import { convertDateFormatForHeading } from "./helpers/convertDateFormatForHeading";
 
 let totalCovidData: any;
 let covidStateData: CovidData[][] = []
@@ -62,11 +63,9 @@ function plotChart(data: CovidData[][]) {
         covidStateAllDates = dates.filter((v,i) => dates.indexOf(v) === i)
         dateSliderInitializer(covidStateAllDates, playPlot)
     })()
-    let presentDate = covidStateAllDates[0];
-    const dateH2 = select('#date')
-    const dateBig=select('#date-big')
-    dateH2.text(convertDateFormat(covidStateAllDates[0]))
-    dateBig.text(convertDateFormat(covidStateAllDates[0]))
+    let presentDate = covidStateAllDates[0]; 
+    const dateBig=select('#date-big') 
+    dateBig.text(convertDateFormatForHeading(covidStateAllDates[0]))
     const totalCases = select('#totalCases')
     let confirmedCases = 0;
     data.forEach((value) => {
@@ -105,7 +104,10 @@ function plotChart(data: CovidData[][]) {
     //rectangles
     bars.append('rect')
         .attr('x', maxDistrictLength)
-        .attr('y', (d) => {
+        .attr('y', (d) => { 
+            if (d[covidStateAllDates[0]]?.confirmed === 0) {
+                return mainSectionNode.clientHeight
+            }
             return 20 * (d[covidStateAllDates[0]] ? rankings.findIndex((e: string) => e === d[covidStateAllDates[0]]?.district) : 0)
         })
         .attr('height', 15)
@@ -120,7 +122,10 @@ function plotChart(data: CovidData[][]) {
         .attr('x', (d) => {
             return xScale(d[covidStateAllDates[0]]?.confirmed ?? 0) + 10 + maxDistrictLength
         })
-        .attr('y', (d) => {
+        .attr('y', (d) => { 
+            if (d[covidStateAllDates[0]]?.confirmed === 0) {
+                return mainSectionNode.clientHeight
+            }
             return 20 * (d[covidStateAllDates[0]] ? rankings.findIndex((e: string) => e === d[covidStateAllDates[0]]?.district) : 0) + 15
         })
         .style('font-size', 14)
@@ -131,7 +136,10 @@ function plotChart(data: CovidData[][]) {
     bars.append('text')
         .attr('class', 'districtName')
         .attr('x', maxDistrictLength - 10)
-        .attr('y', (d) => {
+        .attr('y', (d) => { 
+            if (d[covidStateAllDates[0]]?.confirmed === 0) {
+                return mainSectionNode.clientHeight
+            }
             return 20 * (d[covidStateAllDates[0]] ? rankings.findIndex((e: string) => e === d[covidStateAllDates[0]]?.district) : 0) + 15
         })
         .attr("text-anchor", "end")
@@ -171,9 +179,8 @@ function plotChart(data: CovidData[][]) {
     //-----------------------------------
 
     return (date: string) => {
-        presentDate = date;
-        dateH2.text(convertDateFormat(presentDate))
-        dateBig.text(convertDateFormat(presentDate))
+        presentDate = date; 
+        dateBig.text(convertDateFormatForHeading(presentDate))
         const updatedRankings = data.map((district: CovidData[]) => district[date])
             .sort((a: CovidData, b: CovidData) => b.confirmed - a.confirmed)
             .map((d: CovidData) => d ? d.district : '') 
@@ -219,7 +226,7 @@ function plotChart(data: CovidData[][]) {
                 return (d[date] ? d[date].district : '')
             })
             .transition()
-            .duration(500)
+            .duration(ticker / 1.2)
             .ease(easeLinear)
             .attr('x', maxDistrictLength - 10)
             .attr('y', (d: CovidData[]) => { 
@@ -228,14 +235,10 @@ function plotChart(data: CovidData[][]) {
                 }
                 return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight) + 15
             })
-        select('g.x-axis').call(axisTop(newXScale))
+        select('g.x-axis')
+            .transition()
+            .duration(ticker / 1.2)
+            .ease(easeLinear)
+            .call(axisTop(newXScale))
     }
 } 
-
-function convertDateFormat(inputDate){
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-    let date=new Date(inputDate);
-    return date.getDate()+'-'+monthNames[date.getMonth()]+'-'+date.getFullYear();
-}
