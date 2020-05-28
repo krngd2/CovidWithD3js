@@ -7,9 +7,10 @@ body {
 }
 #heading {
     text-align: center;
+    line-height: 0;
 }
 #raceChart {
-    height: 100vh;
+    height: 80vh;
     width: 100%;
 }
 .x-axis {
