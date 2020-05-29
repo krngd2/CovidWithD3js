@@ -39,7 +39,9 @@ select {
     border-radius: 0;
     font-size: 1.5rem;
 }
-
+select#select_state:disabled {
+    color: red;
+}
 select:focus,
 select:active {
     outline: 0;
@@ -110,3 +112,4 @@ div.tooltip {
     font-size: 26px;
     font-weight: 400;
 }
+ 
