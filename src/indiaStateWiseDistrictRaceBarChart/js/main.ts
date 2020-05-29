@@ -128,7 +128,7 @@ function plotChart(data: CovidData[][]) {
             }
             return 20 * (d[covidStateAllDates[0]] ? rankings.findIndex((e: string) => e === d[covidStateAllDates[0]]?.district) : 0) + 15
         })
-        .style('font-size', 14)
+        .style('font-size', 18)
         .html((d) => {
             return (d[covidStateAllDates[0]]?.confirmed ?? '')
         })
@@ -143,7 +143,7 @@ function plotChart(data: CovidData[][]) {
             return 20 * (d[covidStateAllDates[0]] ? rankings.findIndex((e: string) => e === d[covidStateAllDates[0]]?.district) : 0) + 15
         })
         .attr("text-anchor", "end")
-        .style('font-size', 14)
+        .style('font-size', 18)
         .html((d) => {
             return (d[covidStateAllDates[0]]?.district ?? '')
         })
