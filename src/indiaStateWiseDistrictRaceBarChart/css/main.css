@@ -24,6 +24,7 @@ select {
     font-weight: bold;
     letter-spacing: 0.15em;
     border-radius: 0;
+    font-size: 1.5rem;
 }
 
 select:focus,
