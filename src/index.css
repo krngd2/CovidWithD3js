@@ -4,3 +4,7 @@
     object-fit: contain;
     height: 60%;
 }
+.vl {
+    border-left: 1px solid grey;
+    height: 100px;
+  }

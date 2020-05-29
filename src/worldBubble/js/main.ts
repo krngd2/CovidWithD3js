@@ -1,7 +1,6 @@
 import { select, pack, hierarchy, scaleOrdinal, schemePastel2, zoom, event, interpolateZoom, min, easePolyInOut, zoomIdentity } from "d3";
 import { getData } from "./data";
-
-let worldData; 
+let worldData;
 getData().then((data) => {
     worldData = data
     plotChart(worldData)
@@ -13,7 +12,7 @@ function plotChart(data: []) {
     const width = mainsectionElement.clientWidth
     const height = mainsectionElement.clientHeight
     const color = scaleOrdinal().range(schemePastel2)
-                    
+
     const svg = mainsection.append('svg')
                 .attr('width', width)
                 .attr('height', height)
@@ -33,10 +32,10 @@ function plotChart(data: []) {
     const dataNodes = hierarchy(data)
     dataNodes.sum((d) => d['Active Cases_text'])
                 .sort((d) => d['Active Cases_text'])
-    
+
     const packLayout = pack().size([width, height]).padding((d) => d.r * 0.4 < 6 ? d.r * 0.1 : 1)
-    packLayout(dataNodes) 
-    
+    packLayout(dataNodes)
+
 
     const contries = select('svg g')
             .selectAll('circle')
@@ -44,9 +43,9 @@ function plotChart(data: []) {
             .enter()
             .append('g')
     contries.append('circle')
-            .attr('cx', (d) =>  { 
+            .attr('cx', (d) =>  {
                 // console.log(d);
-                return d.x; 
+                return d.x;
             })
             .attr('cy', (d) => d.y)
             .attr('r', (d) => d.r)
@@ -54,12 +53,12 @@ function plotChart(data: []) {
 
     const contiresText = contries.append('text')
         .style('font-size', (d) => d.r * 0.4 < 16 ? d.r * 0.4 : 16)
-        
+
     contiresText.append('tspan')
             .attr('dy', (d) => d.y - (d.r - (d.r * 0.4 < 16 ? d.r * 0.4:16)))
             .attr('dx', (d) => d.x )
             .text((d) => d.parent ? d.data['Country_text']: '')
-    
+
     const div = select("body").append("div")
             .attr("class", "tooltip")
             .style("opacity", 0);
@@ -80,20 +79,20 @@ function plotChart(data: []) {
             .style("left", (event.pageX) + "px")
             .style('background', (d) => color(i))
             .style("top", (event.pageY - 28) + "px");
-            
+
     }).on("mouseout", function(d) {
         div.transition()
             .duration(500)
             .style("opacity", 0)
 
     });
-    
-    contries.selectAll('circle').on('click', (d,i,n) => { 
+
+    contries.selectAll('circle').on('click', (d,i,n) => {
         const zoomTo = [d.x, d.y, d.r * 2]
         const viewInterplator = interpolateZoom([width, height, min([width, height])], zoomTo)
-        const view  = viewInterplator(0.9) 
+        const view  = viewInterplator(0.9)
         const k = min([width, height]) / view[2];
-        const translate = [width/2 - view[0] *k, height / 2 - view[1] * k]; 
+        const translate = [width/2 - view[0] *k, height / 2 - view[1] * k];
         select('svg > g')
             .transition().ease(easePolyInOut).duration(1000)
             .attr("transform", `translate(${translate}) scale(${k})`)
@@ -102,8 +101,8 @@ function plotChart(data: []) {
         //             .scale(k)
         //             .translate(-translate[0], -translate[1]);
         // svg.call(zoomGenerator.transform, transform)
-    }) 
-    // contiresText.append('tspan') 
+    })
+    // contiresText.append('tspan')
     //         .attr('dy', (d) => 16)
     //         .attr('dx', (d) => -(d.data['Country_text'].length))
     //         .text(function(d) {

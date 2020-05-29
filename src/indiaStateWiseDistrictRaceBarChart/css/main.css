@@ -3,6 +3,19 @@ body {
     box-sizing: border-box;
     font-family: "Exo 2", sans-serif;
 }
+nav{
+    padding: 0;
+    margin-top: 0;
+    padding-top: 0;
+}
+.vl {
+    border-left: 1px solid grey;
+    height: 100px;
+  }
+.work_by{
+    margin: 0;
+    padding: 0;
+}
 #heading {
     text-align: center;
     line-height: 0;
