@@ -8,30 +8,33 @@ svg {
 }
 
 #india {
-    fill: #fff;
+    fill: #c7c9c6;
     opacity: 1;
     stroke: #000000;
     stroke-width: 0.6;
 }
 
-.red .c1-49 {
+.c0 {
+    fill: #c7c9c6;
+}
+.c1-49 {
     fill: #ffd6d6;
 }
-.red .c50-99 {
+.c50-99 {
     fill: #ffacac;
 }
-.red .c100-499 {
+.c100-499 {
     fill: #ff8181;
 }
-.red .c500-999 {
+.c500-999 {
     fill: #ff5454;
 }
-.red .c1000-4999 {
+.c1000-4999 {
     fill: #ff2625;
 }
-.red .c5000-9999 {
+.c5000-9999 {
     fill: #d50000;
 }
-.red .c10000 {
+.c10000 {
     fill: #890000;
 }

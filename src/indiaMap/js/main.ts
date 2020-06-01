@@ -1,14 +1,16 @@
-import {
-  select, geoMercator, geoPath
-} from "d3";
-import { getStatesZonesData, getIndianStatesMap } from "./service";
+import { select } from "d3";
+import { geoMercator, geoPath } from "d3-geo";
+import { getStatesDailyData, formatStatesDailyData, getIndianStatesMap } from "./service";
 
 let w = 600;
 let h = 650;
 let proj = geoMercator();
 let path = geoPath().projection(proj);
-let t = proj.translate(); // the projection's default translation
-let s = proj.scale() // the projection's default scale
+var t = proj.translate(); // the projection's default translation
+var s = proj.scale() // the projection's default scale
+let covidCasesData;
+let covidStateAllDates = new Set();
+let updateChart: Function;
 
 let svg = select("#chart")
   .append("svg:svg")
@@ -16,61 +18,81 @@ let svg = select("#chart")
   .attr("height", h)
   .call(initialize);
 
-let map = svg.append("svg:g")
-
-let india = map.append("svg:g")
+let indiaMap = svg.append("svg:g")
   .attr("id", "india");
-let areaMap = new Map()
-let unidentifiedPlaces = [];
 
-getStatesZonesData().then(async (data) => {
-  for (let i = 0; i < data.length; i++) {
-    for (let j = 0; j < data[i].districtData.length; j++) {
-      areaMap.set(data[i].districtData[j].name, data[i].districtData[j].zone);
-    }
-  }
-  drawMap();
+function initialize() {
+  proj.scale(1000);
+  proj.translate([-1140, 750]);
+}
+
+getStatesDailyData().then(async (data) => {
+  let formattedData = formatStatesDailyData(data);
+  covidCasesData = formattedData.covidCasesData;
+  covidStateAllDates = formattedData.covidStateAllDates;
+  adjustData(covidCasesData);
 })
 
-async function drawMap() {
-  // let distrctMapData: any = getIndianDistrictsMap();
-  // india.selectAll("path")
-  //   .data(distrctMapData.features)
-  //   .enter().append("path")
-  //   .style("stroke", "#e4e4e4")
-  //   .style("opacity", "0.4")
-  //   .style("stroke-width", "0.5px")
-  //   .style("fill", (d: any) => {
-  //     console.log(d.properties.NAME_2);
-  //     if (areaMap.has(d.properties.NAME_2)) {
-  //       return areaMap.get(d.properties.NAME_2);
-  //     } else {
-  //       unidentifiedPlaces.push(d.properties.NAME_2 + "-test");
-  //       return "black";
-  //     }
-  //   })
-  //   .attr("d", path)
-  //   .append("title")
-  //   .text(function (d: any) {
-  //     return "district : " + d.properties.NAME_2 + " " + " state : " + d.properties.NAME_1;
-  //   });
+async function adjustData(data) {
+  // plotMap(data);
+  updateChart = plotMap(data)
+  playPlot();
+}
 
-  let stateMapData: any = getIndianStatesMap();
-  india.selectAll("path").data(stateMapData.features)
-    // .enter()
+async function playPlot() {
+  for (let covidDate of covidStateAllDates) {
+    updateChart(covidDate)
+    await new Promise(done => setTimeout(() => done(), 800));
+  }
+}
+
+function plotMap(covidData) {
+  let indiaMapStructure: any = getIndianStatesMap();
+  indiaMap.selectAll("path").data(indiaMapStructure.features)
+    .enter()
     .append('path')
-    .attr("class", "subunit")
     .attr("d", path)
     .style("stroke", "black")
     .style("opacity", "1")
-    .style("stroke-width", "1px");
-}
-
-setTimeout(() => {
-  console.log(unidentifiedPlaces);
-}, 1000);
-
-function initialize() {
-  proj.scale(6700);
-  proj.translate([-1240, 750]);
+    .style("stroke-width", "1px")
+    .attr("class", (d: any) => {
+      if (d.properties.st_nm === "Daman & Diu" || d.properties.st_nm === "Dadara & Nagar Havelli") {
+        d.properties.st_nm = "Dadra and Nagar Haveli and Daman and Diu";
+      }
+      let covidStatesIterator = covidStateAllDates.values();
+      let first = covidStatesIterator.next();
+      let todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => {
+        return stateData.date === first.value;
+      });
+      let confirmedCases = todayStateData[0].confirmed;
+      if (confirmedCases === 0) { return "c0"; }
+      else if (confirmedCases < 50) { return "c1-49"; }
+      else if (confirmedCases < 100) { return "c50-99"; }
+      else if (confirmedCases < 500) { return "c100-499"; }
+      else if (confirmedCases < 1000) { return "c500-999"; }
+      else if (confirmedCases < 5000) { return "c1000-4999"; }
+      else if (confirmedCases < 10000) { return "c5000-9999"; }
+      else { return "c10000"; }
+    });
+  return (date) => {
+    indiaMap.selectAll("path").transition()
+      .duration(800 / 1.2)
+      .attr("class", (d: any) => {
+        if (d.properties.st_nm === "Daman & Diu" || d.properties.st_nm === "Dadara & Nagar Havelli") {
+          d.properties.st_nm = "Dadra and Nagar Haveli and Daman and Diu";
+        }
+        let todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => {
+          return stateData.date === date;
+        });
+        let confirmedCases = todayStateData[0].confirmed;
+        if (confirmedCases === 0) { return "c0"; }
+        else if (confirmedCases < 50) { return "c1-49"; }
+        else if (confirmedCases < 100) { return "c50-99"; }
+        else if (confirmedCases < 500) { return "c100-499"; }
+        else if (confirmedCases < 1000) { return "c500-999"; }
+        else if (confirmedCases < 5000) { return "c1000-4999"; }
+        else if (confirmedCases < 10000) { return "c5000-9999"; }
+        else { return "c10000"; }
+      });
+  }
 }
