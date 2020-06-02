@@ -21,6 +21,9 @@ let svg = select("#chart")
 let indiaMap = svg.append("svg:g")
   .attr("id", "india");
 
+let stateLabels = svg.append("svg:g")
+  .attr("id", "labels");
+
 function initialize() {
   proj.scale(1000);
   proj.translate([-1140, 750]);
@@ -63,15 +66,28 @@ function plotMap(covidData) {
     .style("opacity", "1")
     .style("stroke-width", "0.4px")
     .style('fill', (d: any) => {
-        let todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => stateData.date === firstDates[0] );
-        return colorScale(!todayStateData ? 0: todayStateData[0].confirmed)
+       let todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => stateData.date === firstDates[0]);
+       return colorScale(!todayStateData ? 0 : todayStateData[0].confirmed)
+    });
+  stateLabels.selectAll("labels")
+    .data(indiaMapStructure.features)
+    .enter()
+    .append("text")
+    .attr('x', function (d: any) { return path.centroid(d)[0]; })
+    .attr('y', function (d: any) { return path.centroid(d)[1]; })
+    .style('fill', "black")
+    .text((d: any) => {
+      let todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => stateData.date === firstDates[0]);
+      return !todayStateData?"":todayStateData[0].stateCode;
     })
+    .attr("text-anchor", "middle")
+    .style('font-size', 12);
   return (date) => {
     indiaMap.selectAll("path").transition()
       .duration(800 / 1.2)
       .style('fill', (d: any) => {
-          let todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => stateData.date === date );
-          return colorScale(!todayStateData ? 0: todayStateData[0]?.confirmed)
+        let todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => stateData.date === date);
+        return colorScale(!todayStateData ? 0 : todayStateData[0]?.confirmed)
       })
   }
 }

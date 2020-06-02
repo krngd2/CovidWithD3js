@@ -37,7 +37,8 @@ export function formatStatesDailyData(data) {
                     confirmed: +totalCovidDataState[i][p],
                     recovered: +totalCovidDataState[i + 1][p],
                     deceased: +totalCovidDataState[i + 2][p],
-                    date: convertDate(totalCovidDataState[i]['date'])
+                    date: convertDate(totalCovidDataState[i]['date']),
+                    stateCode:p.toUpperCase()
                 }
                 covidStateAllDates.add(convertDate(totalCovidDataState[i]['date']));
                 covidCasesData[stateCodes[p]].push(obj)
