@@ -1,9 +1,12 @@
-import * as statesMapData from '../data/states_india.json';
 import { stateCodes } from './mappers/stateCodes.mapper';
 import { monthsNames } from './mappers/months.mapper';
 
 export function getIndianStatesMap() {
-    return statesMapData;
+    return fetch('https://raw.githubusercontent.com/lokeshkotha/india-map-with-covid-zones/master/data/states_india.json').then(res => res.json())
+        .then((data: any) => {
+            return data
+        })
+        .catch(console.error);
 }
 
 export function getStatesDailyData() {
@@ -38,7 +41,7 @@ export function formatStatesDailyData(data) {
                     recovered: +totalCovidDataState[i + 1][p],
                     deceased: +totalCovidDataState[i + 2][p],
                     date: convertDate(totalCovidDataState[i]['date']),
-                    stateCode:p.toUpperCase()
+                    stateCode: p.toUpperCase()
                 }
                 covidStateAllDates.add(convertDate(totalCovidDataState[i]['date']));
                 covidCasesData[stateCodes[p]].push(obj)
