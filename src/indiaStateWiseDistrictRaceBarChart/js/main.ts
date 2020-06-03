@@ -5,34 +5,36 @@ import {
     scaleLinear, max, schemeTableau10,
     scaleOrdinal, axisTop, easeLinear
 } from "d3";
-import getUnicodeFlagIcon from 'country-flag-icons/unicode'
 import { dropdownInitializer } from "./initializers/dropdown.initializer";
 import { getStatesData, addIndiaData, addWorldData } from "./data";
 import { disableEnableOptions } from "./helpers/disableEnableOptions";
 import { dateSliderInitializer } from "./initializers/dateSlider.initializer";
 import { convertCovidObjToArray } from "./helpers/convertObjToArray";
 import { convertDateFormatForHeading } from "./helpers/convertDateFormatForHeading";
+import { getCountryCode } from "./mappers/countryCode.mapper";
+import { getFlagByCode } from "./mappers/codeToEmoji.mapper";
 
 let totalCovidData: any;
 let covidStateData: CovidData[][] = []
 let covidStateAllDates: string[]
 let updateChart: Function;
 let ticker: number = 800;
+let selectedState: string = '0';
 
 select('#speedRange').on('change', (d, i, n) => {
     ticker = Math.abs(n[0].value);
 })
 
 getStatesData().then(async (data) => {
-    totalCovidData = await addIndiaData(data.districtsDaily)
     totalCovidData = await addWorldData(data.districtsDaily)
+    totalCovidData = await addIndiaData(data.districtsDaily) 
     dropdownInitializer(Object.keys(totalCovidData), adjustData)
     adjustData()
 })
 
 async function adjustData() {
     const selectElement = select('#select_state')
-    const selectedState = selectElement.property("value")
+    selectedState = selectElement.property("value")
     if (selectedState === '0') return;
     covidStateData = convertCovidObjToArray(totalCovidData[selectedState])
     updateChart = plotChart(covidStateData)
@@ -147,9 +149,8 @@ function plotChart(data: CovidData[][]) {
         .attr("text-anchor", "end")
         .style('font-size', 18)
         .html((d) => {
-
-            return (d[covidStateAllDates[0]]?.district ?? '')
-        })
+            return `<i class="flag-icon flag-icon-${getCountryCode(d[covidStateAllDates[0]]?.district).toLocaleLowerCase()}"></i> ${(d[covidStateAllDates[0]]?.district ?? '')}`
+        }) 
 
 
 
@@ -227,9 +228,6 @@ function plotChart(data: CovidData[][]) {
                 return 20 * (d[date] ?  (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight) + 15
             })
         bars.selectAll('.districtName')
-            .html((d: CovidData[]) => {
-                return (d[date] ? d[date].district : '')
-            })
             .transition()
             .duration(ticker / 1.2)
             .ease(easeLinear)

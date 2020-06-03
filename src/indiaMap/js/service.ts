@@ -1,9 +1,9 @@
-import * as statesMapData from '../data/states_india.json';
+// import * as statesMapData from '../data/states_india.json';
 import { stateCodes } from './mappers/stateCodes.mapper';
 import { monthsNames } from './mappers/months.mapper';
 
 export function getIndianStatesMap() {
-    return statesMapData;
+    // return statesMapData;
 }
 
 export function getStatesDailyData() {
