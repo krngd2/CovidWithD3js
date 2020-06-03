@@ -4,9 +4,10 @@ import {
     select, timeParse,
     scaleLinear, max, schemeTableau10,
     scaleOrdinal, axisTop, easeLinear
-} from "d3"; 
+} from "d3";
+import getUnicodeFlagIcon from 'country-flag-icons/unicode'
 import { dropdownInitializer } from "./initializers/dropdown.initializer";
-import { getStatesData, addIndiaData } from "./data";
+import { getStatesData, addIndiaData, addWorldData } from "./data";
 import { disableEnableOptions } from "./helpers/disableEnableOptions";
 import { dateSliderInitializer } from "./initializers/dateSlider.initializer";
 import { convertCovidObjToArray } from "./helpers/convertObjToArray";
@@ -24,14 +25,15 @@ select('#speedRange').on('change', (d, i, n) => {
 
 getStatesData().then(async (data) => {
     totalCovidData = await addIndiaData(data.districtsDaily)
+    totalCovidData = await addWorldData(data.districtsDaily)
     dropdownInitializer(Object.keys(totalCovidData), adjustData)
     adjustData()
 })
 
 async function adjustData() {
     const selectElement = select('#select_state')
-    const selectedState = selectElement.property("value") 
-    if (selectedState === '0') return; 
+    const selectedState = selectElement.property("value")
+    if (selectedState === '0') return;
     covidStateData = convertCovidObjToArray(totalCovidData[selectedState])
     updateChart = plotChart(covidStateData)
     await playPlot()
@@ -63,8 +65,8 @@ function plotChart(data: CovidData[][]) {
         covidStateAllDates = dates.filter((v,i) => dates.indexOf(v) === i)
         dateSliderInitializer(covidStateAllDates, playPlot)
     })()
-    let presentDate = covidStateAllDates[0]; 
-    const dateBig=select('#date-big') 
+    let presentDate = covidStateAllDates[0];
+    const dateBig=select('#date-big')
     dateBig.text(convertDateFormatForHeading(covidStateAllDates[0]))
     const totalCases = select('#totalCases')
     let confirmedCases = 0;
@@ -76,8 +78,8 @@ function plotChart(data: CovidData[][]) {
     mainSection.html('')
     const rankings = data.map((district: CovidData[]) => district[covidStateAllDates[0]])
         .sort((a: CovidData, b: CovidData) => b.confirmed - a.confirmed)
-        .map(d => d ? d.district : '').filter(v => v !== "") 
-        
+        .map(d => d ? d.district : '').filter(v => v !== "")
+
     const mainSectionNode: HTMLElement = mainSection.node() as HTMLElement
     // data.sort( (a, b) => b.confirmed - a.confirmed)
     const mainSvg = mainSection.append('svg')
@@ -104,7 +106,7 @@ function plotChart(data: CovidData[][]) {
     //rectangles
     bars.append('rect')
         .attr('x', maxDistrictLength)
-        .attr('y', (d) => { 
+        .attr('y', (d) => {
             if (d[covidStateAllDates[0]]?.confirmed === 0) {
                 return mainSectionNode.clientHeight
             }
@@ -122,7 +124,7 @@ function plotChart(data: CovidData[][]) {
         .attr('x', (d) => {
             return xScale(d[covidStateAllDates[0]]?.confirmed ?? 0) + 10 + maxDistrictLength
         })
-        .attr('y', (d) => { 
+        .attr('y', (d) => {
             if (d[covidStateAllDates[0]]?.confirmed === 0) {
                 return mainSectionNode.clientHeight
             }
@@ -136,7 +138,7 @@ function plotChart(data: CovidData[][]) {
     bars.append('text')
         .attr('class', 'districtName')
         .attr('x', maxDistrictLength - 10)
-        .attr('y', (d) => { 
+        .attr('y', (d) => {
             if (d[covidStateAllDates[0]]?.confirmed === 0) {
                 return mainSectionNode.clientHeight
             }
@@ -145,8 +147,11 @@ function plotChart(data: CovidData[][]) {
         .attr("text-anchor", "end")
         .style('font-size', 18)
         .html((d) => {
+
             return (d[covidStateAllDates[0]]?.district ?? '')
         })
+
+
 
     const xAxis = axisTop(xScale)
     mainSvg.append('g')
@@ -179,11 +184,11 @@ function plotChart(data: CovidData[][]) {
     //-----------------------------------
 
     return (date: string) => {
-        presentDate = date; 
+        presentDate = date;
         dateBig.text(convertDateFormatForHeading(presentDate))
         const updatedRankings = data.map((district: CovidData[]) => district[date])
             .sort((a: CovidData, b: CovidData) => b.confirmed - a.confirmed)
-            .map((d: CovidData) => d ? d.district : '') 
+            .map((d: CovidData) => d ? d.district : '')
         const newXScale = scaleLinear()
             .domain([0, max(data.map((d: CovidData[]) => d[date]?.confirmed ?? 0)) + 100])
             .range([0, mainSectionNode.clientWidth - 100 - maxDistrictLength])
@@ -201,7 +206,7 @@ function plotChart(data: CovidData[][]) {
                 return newXScale(d[date]?.confirmed ?? 0)
             })
             .attr('y', (d: CovidData[]) => {
-                
+
                 if (d[date]?.confirmed === 0) {
                     return mainSectionNode.clientHeight
                 }
@@ -229,7 +234,7 @@ function plotChart(data: CovidData[][]) {
             .duration(ticker / 1.2)
             .ease(easeLinear)
             .attr('x', maxDistrictLength - 10)
-            .attr('y', (d: CovidData[]) => { 
+            .attr('y', (d: CovidData[]) => {
                 if (d[date]?.confirmed === 0) {
                     return mainSectionNode.clientHeight
                 }
@@ -241,4 +246,4 @@ function plotChart(data: CovidData[][]) {
             .ease(easeLinear)
             .call(axisTop(newXScale))
     }
-} 
+}

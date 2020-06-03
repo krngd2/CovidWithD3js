@@ -13,8 +13,10 @@
     "last 1 Chrome versions"
   ],
   "dependencies": {
+    "country-flag-icons": "^1.2.1",
     "d3": "^5.16.0",
-    "d3-geo": "^1.12.1"
+    "d3-geo": "^1.12.1",
+    "flag-icon-css": "^3.4.6"
   },
   "devDependencies": {
     "@types/d3": "^5.7.2",

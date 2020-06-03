@@ -1,13 +1,13 @@
 import { stateCodes } from "./mappers/states.mapper"
 import { convertDate } from "./helpers/convertDate"
 
-export function getStatesData() { 
+export function getStatesData() {
     return fetch('https://api.covid19india.org/districts_daily.json')
         .then(res => res.json())
         .then((data: any) => {
             return data
         })
-        .catch(console.error) 
+        .catch(console.error)
 }
 
 export async function addIndiaData(data){
@@ -46,7 +46,51 @@ export async function addIndiaData(data){
                 }
             }
         })
-        .catch(console.error) 
+        .catch(console.error)
+    console.log(India)
     data["All-India"] = India
+    return data
+}
+
+
+
+export async function addWorldData(data){
+    let World = {}
+    await fetch('https://covid.ourworldindata.org/data/owid-covid-data.json')
+        .then(res => res.json())
+        .then((data: any) => {
+            const china = []
+            for (let i = 0; i< data['CHN'].length; i++){
+                var obj = {
+                    confirmed: data['CHN'][i].total_cases,
+                    recovered: NaN,
+                    deceased: data['CHN'][i].total_deaths,
+                    active: NaN,
+                    date: data['CHN'][i].date
+                }
+                china.push(obj);
+            }
+            World['China'] = china
+
+            for(let d in data){
+                var country = []
+                if(d != 'OWID_WRL' && d != 'CHN'){
+                    for (let i = 0; i< data[d].length; i++){
+                        var obj = {
+                            confirmed: data[d][i].total_cases,
+                            recovered: NaN,
+                            deceased: data[d][i].total_deaths,
+                            active: NaN,
+                            date: data[d][i].date
+                        }
+                        country.push(obj);
+                    }
+                    World[data[d][0].location] = country
+                }
+
+            }
+        })
+        .catch(console.error)
+    data["All-World"] = World
     return data
 }
