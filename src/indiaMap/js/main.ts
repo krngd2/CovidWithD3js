@@ -11,21 +11,25 @@ var s = proj.scale() // the projection's default scale
 let covidCasesData;
 let covidStateAllDates;
 let updateChart: Function;
+let indiaMapStructure: any;
 
 function initialize() {
   proj.scale(1000);
   proj.translate([-1140, 750]);
 }
 
-getStatesDailyData().then(async (data) => {
-  let formattedData = formatStatesDailyData(data);
+let mapDataPromise = new Promise((resolve) => resolve(getIndianStatesMap()));
+let covidDataPromise = new Promise((resolve) => resolve(getStatesDailyData()));
+
+Promise.all([mapDataPromise, covidDataPromise]).then((responses) => {
+  indiaMapStructure = responses[0];
+  let formattedData = formatStatesDailyData(responses[1]);
   covidCasesData = formattedData.covidCasesData;
   covidStateAllDates = formattedData.covidStateAllDates;
   adjustData(covidCasesData);
-})
+});
 
 async function adjustData(data) {
-  // plotMap(data);
   updateChart = plotMap(data)
   playPlot();
 }
@@ -38,22 +42,21 @@ async function playPlot() {
 }
 
 function plotMap(covidData) {
-  let indiaMapStructure: any = getIndianStatesMap();
-  indiaMapStructure.default.features = indiaMapStructure.default.features.filter(function (data) {
+  indiaMapStructure.features = indiaMapStructure.features.filter(function (data) {
     return data.properties.st_nm !== 'Daman & Diu';
   });
   const maxValue = max(Object.values(covidData).flat(Infinity), (d: any) => Number(d.confirmed))
   const colorScale = scaleLinear()
-                        .domain([0, 1, 100, 1000, maxValue])
-                        .range([ 'green', 'yellow', 'orange', 'rgb(255, 100, 100)', 'red']);
+    .domain([0, 1, 100, 1000, maxValue])
+    .range(['green', 'yellow', 'orange', 'rgb(255, 100, 100)', 'red']);
   let firstDates = [...covidStateAllDates]
-  
-      
+
+
   let svg = select("#chart")
-        .append("svg:svg")
-        .attr("width", w)
-        .attr("height", h)
-        .call(initialize);
+    .append("svg:svg")
+    .attr("width", w)
+    .attr("height", h)
+    .call(initialize);
 
   let indiaMap = svg.append("svg:g")
     .attr("id", "india");
@@ -67,9 +70,9 @@ function plotMap(covidData) {
   let stateLines = svg.append("svg:g")
     .attr("id", "lines");
   const dateText = svg.append('text')
-                    .attr('x', 300)
-                    .attr('y', 100)
-                    .text(firstDates[0])
+    .attr('x', 300)
+    .attr('y', 100)
+    .text(firstDates[0])
   indiaMap.selectAll("path")
     .data(indiaMapStructure.features)
     .enter()
@@ -79,15 +82,15 @@ function plotMap(covidData) {
     .style("opacity", "1")
     .style("stroke-width", "0.4px")
     .style('fill', (d: any) => {
-       let todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => stateData.date === firstDates[0]);
-       return colorScale(!todayStateData ? 0 : todayStateData[0].confirmed)
+      let todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => stateData.date === firstDates[0]);
+      return colorScale(!todayStateData ? 0 : todayStateData[0].confirmed)
     });
   //state names
   stateLabels.selectAll("labels")
     .data(indiaMapStructure.features)
     .enter()
     .append("text")
-    .attr('x', function (d: any) { 
+    .attr('x', function (d: any) {
       return path.centroid(d)[0]
     })
     .attr('y', function (d: any) {
