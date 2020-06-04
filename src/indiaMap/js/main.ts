@@ -50,7 +50,7 @@ function plotMap(covidData) {
     .domain([0, 1, 100, 1000, maxValue])
     .range(['green', 'yellow', 'orange', 'rgb(255, 100, 100)', 'red']);
   let firstDates = [...covidStateAllDates]
-
+  let presentDate = firstDates[0]
 
   let svg = select("#chart")
     .append("svg:svg")
@@ -73,6 +73,10 @@ function plotMap(covidData) {
     .attr('x', 300)
     .attr('y', 100)
     .text(firstDates[0])
+    
+  const div = select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
   indiaMap.selectAll("path")
     .data(indiaMapStructure.features)
     .enter()
@@ -84,7 +88,24 @@ function plotMap(covidData) {
     .style('fill', (d: any) => {
       let todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => stateData.date === firstDates[0]);
       return colorScale(!todayStateData ? 0 : todayStateData[0].confirmed)
-    });
+    }).on("mouseover", (d: any, index) => {
+      const todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => stateData.date === presentDate);
+
+      div.transition()
+          .duration(200)
+          .style("opacity", .9);
+      div.html("<b>" + todayStateData[0]?.stateCode + "</b>" +
+          "<br/><b>Confirmed: </b>" + todayStateData[0]?.confirmed +
+          "<br/><b>Recovered:</b> " + todayStateData[0]?.recovered +
+          "<br/><b>Deaths:</b> " + todayStateData[0]?.deceased)
+          .style("left", (event.pageX) + "px")
+          .style('background', 'white')
+          .style("top", (event.pageY - 28) + "px");
+      }).on("mouseout", function (d) {
+          div.transition()
+              .duration(500)
+              .style("opacity", 0);
+      });
   //state names
   stateLabels.selectAll("labels")
     .data(indiaMapStructure.features)
@@ -182,6 +203,7 @@ function plotMap(covidData) {
       return path.area(d) > 500;
     }).remove();
   return (date) => {
+    presentDate = date;
     dateText.text(date)
     indiaMap.selectAll("path").transition()
       .duration(800 / 1.2)

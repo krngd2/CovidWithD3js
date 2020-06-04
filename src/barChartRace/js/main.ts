@@ -12,7 +12,6 @@ import { dateSliderInitializer } from "./initializers/dateSlider.initializer";
 import { convertCovidObjToArray } from "./helpers/convertObjToArray";
 import { convertDateFormatForHeading } from "./helpers/convertDateFormatForHeading";
 import { getCountryCode } from "./mappers/countryCode.mapper";
-import { getFlagByCode } from "./mappers/codeToEmoji.mapper";
 
 let totalCovidData: any;
 let covidStateData: CovidData[][] = []
