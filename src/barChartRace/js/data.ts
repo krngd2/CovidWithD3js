@@ -1,7 +1,7 @@
 import { stateCodes } from "./mappers/states.mapper"
 import { convertDate } from "./helpers/convertDate"
 
-export function getStatesData() {
+export async function getStatesData() { 
     return fetch('https://api.covid19india.org/districts_daily.json')
         .then(res => res.json())
         .then((data: any) => {
