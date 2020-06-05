@@ -1,8 +1,9 @@
 import { select, scaleLinear, max, line } from "d3";
 import { geoMercator, geoPath } from "d3-geo";
 import { getStatesDailyData, formatStatesDailyData, getIndianStatesMap } from "./service";
+import { convertDateFormatForHeading } from "../../barChartRace/js/helpers/convertDateFormatForHeading";
 
-let w = 600;
+let w = 620;
 let h = 650;
 let proj = geoMercator();
 let path = geoPath().projection(proj);
@@ -10,6 +11,7 @@ var t = proj.translate(); // the projection's default translation
 var s = proj.scale() // the projection's default scale
 let covidCasesData;
 let covidStateAllDates;
+let covidTotalCasesData;
 let updateChart: Function;
 let indiaMapStructure: any;
 
@@ -23,9 +25,10 @@ let covidDataPromise = new Promise((resolve) => resolve(getStatesDailyData()));
 
 Promise.all([mapDataPromise, covidDataPromise]).then((responses) => {
   indiaMapStructure = responses[0];
-  let formattedData = formatStatesDailyData(responses[1]);
+  let formattedData: any = formatStatesDailyData(responses[1]);
   covidCasesData = formattedData.covidCasesData;
   covidStateAllDates = formattedData.covidStateAllDates;
+  covidTotalCasesData = formattedData.covidTotalCasesData;
   adjustData(covidCasesData);
 });
 
@@ -70,13 +73,21 @@ function plotMap(covidData) {
   let stateLines = svg.append("svg:g")
     .attr("id", "lines");
   const dateText = svg.append('text')
-    .attr('x', 300)
-    .attr('y', 100)
-    .text(firstDates[0])
-    
+    .attr('x', 360)
+    .attr('y', 50)
+    .style('font-size', '24px')
+    .style('font-weight', '600')
+    .text(firstDates[0]);
+  const totalCases = svg.append('text')
+    .attr('x', 360)
+    .attr('y', 80)
+    .style('font-size', '24px')
+    .style('font-weight', '600')
+    .text("Total Cases -" + covidTotalCasesData.filter((countData) => countData.date === firstDates[0])[0].totalConfirmedCases);
+
   const div = select("body").append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
+    .attr("class", "tooltip")
+    .style("opacity", 0);
   indiaMap.selectAll("path")
     .data(indiaMapStructure.features)
     .enter()
@@ -90,22 +101,21 @@ function plotMap(covidData) {
       return colorScale(!todayStateData ? 0 : todayStateData[0].confirmed)
     }).on("mouseover", (d: any, index) => {
       const todayStateData = covidData[d.properties.st_nm]?.filter((stateData) => stateData.date === presentDate);
-
       div.transition()
-          .duration(200)
-          .style("opacity", .9);
-      div.html("<b>" + todayStateData[0]?.stateCode + "</b>" +
-          "<br/><b>Confirmed: </b>" + todayStateData[0]?.confirmed +
-          "<br/><b>Recovered:</b> " + todayStateData[0]?.recovered +
-          "<br/><b>Deaths:</b> " + todayStateData[0]?.deceased)
-          .style("left", (event.pageX) + "px")
-          .style('background', 'white')
-          .style("top", (event.pageY - 28) + "px");
-      }).on("mouseout", function (d) {
-          div.transition()
-              .duration(500)
-              .style("opacity", 0);
-      });
+        .duration(200)
+        .style("opacity", .9);
+      div.html("<b>" + d.properties.st_nm + "</b>" +
+        "<br/><b>Confirmed: </b>" + todayStateData[0]?.confirmed +
+        "<br/><b>Recovered:</b> " + todayStateData[0]?.recovered +
+        "<br/><b>Deaths:</b> " + todayStateData[0]?.deceased)
+        .style("left", (event.pageX) + "px")
+        .style('background', '#52A1B8')
+        .style("top", (event.pageY - 28) + "px");
+    }).on("mouseout", function (d) {
+      div.transition()
+        .duration(500)
+        .style("opacity", 0);
+    });
   //state names
   stateLabels.selectAll("labels")
     .data(indiaMapStructure.features)
@@ -204,7 +214,8 @@ function plotMap(covidData) {
     }).remove();
   return (date) => {
     presentDate = date;
-    dateText.text(date)
+    dateText.text(convertDateFormatForHeading(date));
+    totalCases.text("Total Cases -" + covidTotalCasesData.filter((countData) => countData.date === date)[0].totalConfirmedCases);
     indiaMap.selectAll("path").transition()
       .duration(800 / 1.2)
       .style('fill', (d: any) => {

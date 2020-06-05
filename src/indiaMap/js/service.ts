@@ -21,9 +21,11 @@ export function getStatesDailyData() {
 export function formatStatesDailyData(data) {
     let response = {
         covidStateAllDates: new Set(),
-        covidCasesData: []
+        covidCasesData: [],
+        covidTotalCasesData: []
     };
     let covidStateAllDates = new Set();
+    let covidTotalCasesData = [];
     let covidCasesData = [];
     let totalCovidDataState = data.states_daily;
     for (let i = 0; i < 1; i = i + 3) {
@@ -33,7 +35,13 @@ export function formatStatesDailyData(data) {
             }
         }
     }
+    let totalConfirmedCases = 0;
     for (let i = 0; i < totalCovidDataState.length; i = i + 3) {
+        let totalCases = {
+            date: "",
+            confirmedCases: 0,
+            totalConfirmedCases: 0,
+        }
         for (let p in totalCovidDataState[i]) {
             if (p in stateCodes) {
                 let obj = {
@@ -43,10 +51,15 @@ export function formatStatesDailyData(data) {
                     date: convertDate(totalCovidDataState[i]['date']),
                     stateCode: p.toUpperCase()
                 }
+                totalCases.date = convertDate(totalCovidDataState[i]['date']);
+                totalCases.confirmedCases += Number(totalCovidDataState[i][p]);
+                totalConfirmedCases += Number(totalCovidDataState[i][p]);
                 covidStateAllDates.add(convertDate(totalCovidDataState[i]['date']));
                 covidCasesData[stateCodes[p]].push(obj)
             }
         }
+        totalCases.totalConfirmedCases = totalConfirmedCases;
+        covidTotalCasesData.push(totalCases);
     }
     for (let p in covidCasesData) {
         for (let j in covidCasesData[p]) {
@@ -59,6 +72,7 @@ export function formatStatesDailyData(data) {
     }
     response.covidStateAllDates = covidStateAllDates;
     response.covidCasesData = covidCasesData;
+    response.covidTotalCasesData = covidTotalCasesData;
     return response;
 }
 
