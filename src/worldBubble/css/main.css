@@ -18,10 +18,10 @@ body {
 div.tooltip {
     position: absolute;
     text-align: center;
-    width: 70px;
-    height: 70px;
+    width: 150px;
+    height: 120px;
     padding: 2px;
-    font: 6px sans-serif;
+    font: 12px sans-serif;
     border: 0px;
     border-radius: 8px;
     pointer-events: none;
