@@ -105,11 +105,10 @@ function plotMap(covidData) {
         .duration(200)
         .style("opacity", .9);
       div.html("<b>" + d.properties.st_nm + "</b>" +
-        "<br/><b>Confirmed: </b>" + todayStateData[0]?.confirmed +
-        "<br/><b>Recovered:</b> " + todayStateData[0]?.recovered +
-        "<br/><b>Deaths:</b> " + todayStateData[0]?.deceased)
+        "<br/><br/>Confirmed: <b>" + todayStateData[0]?.confirmed +
+        "</b><br/>Recovered:<b> " + todayStateData[0]?.recovered +
+        "</b><br/>Deaths:<b> " + todayStateData[0]?.deceased + "</b><br>")
         .style("left", (event.pageX) + "px")
-        .style('background', '#52A1B8')
         .style("top", (event.pageY - 28) + "px");
     }).on("mouseout", function (d) {
       div.transition()
@@ -148,11 +147,11 @@ function plotMap(covidData) {
           .attr("transform", function (d: any) { return "translate(" + path.centroid(d) + ")"; })
           .attr("x", function (d: any) {
             if (path.centroid(d)[0] < w / 2) return 0 - path.centroid(d)[0];
-            else return -15;
+            else return 15;
           })
           .attr("y", function (d: any) {
             if (path.centroid(d)[0] < w / 2) return -4;
-            else if (path.centroid(d)[1] < h / 2) return -120;
+            else if (path.centroid(d)[1] < h / 2) return 140;
             else return 50;
           })
           .attr("fill", "black")
@@ -181,9 +180,9 @@ function plotMap(covidData) {
       return path.area(d) > 500;
     }).remove();
   //Draw Lines
-  let connectionLine = line()
-    .x(function (d: any) { return d.x; })
-    .y(function (d: any) { return d.y; });
+  const connectionLine = line()
+                      .x(function (d: any) { return d.x; })
+                      .y(function (d: any) { return d.y; });
   stateLines.selectAll("lines")
     .data(indiaMapStructure.features)
     .enter()
@@ -194,8 +193,8 @@ function plotMap(covidData) {
         labelPosition.x = 0 - path.centroid(d)[0];
         labelPosition.y = path.centroid(d)[1];
       } else if (path.centroid(d)[1] < h / 2) {
-        labelPosition.x = path.centroid(d)[0] + 10;
-        labelPosition.y = path.centroid(d)[1] - 120;
+        labelPosition.x = path.centroid(d)[0] + 25;
+        labelPosition.y = path.centroid(d)[1] + 120;
       } else {
         labelPosition.x = path.centroid(d)[0] + 10;
         labelPosition.y = path.centroid(d)[1] + 50;
