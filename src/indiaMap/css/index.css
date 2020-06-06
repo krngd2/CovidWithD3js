@@ -20,7 +20,9 @@ div.tooltip {
     width: 150px;
     padding: 2px;
     font: 12px sans-serif;
-    border: 0px;
-    border-radius: 8px;
     pointer-events: none;
+    background-color: wheat;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0px 0px 6px 6px grey;
 }
