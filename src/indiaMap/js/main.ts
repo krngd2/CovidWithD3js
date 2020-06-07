@@ -1,7 +1,8 @@
-import { select, scaleLinear, max, line } from "d3";
+import { select, scaleLinear, max, line, timeParse } from "d3";
 import { geoMercator, geoPath } from "d3-geo";
 import { getStatesDailyData, formatStatesDailyData, getIndianStatesMap } from "./service";
 import { convertDateFormatForHeading } from "../../barChartRace/js/helpers/convertDateFormatForHeading";
+import { dateSliderInitializer } from "../../barChartRace/js/initializers/dateSlider.initializer";
 
 let w = 620;
 let h = 650;
@@ -15,33 +16,36 @@ let covidTotalCasesData;
 let updateChart: Function;
 let indiaMapStructure: any;
 
-function initialize() {
-  proj.scale(1000);
-  proj.translate([-1140, 750]);
-}
-
 let mapDataPromise = new Promise((resolve) => resolve(getIndianStatesMap()));
 let covidDataPromise = new Promise((resolve) => resolve(getStatesDailyData()));
+
+const dateRange = select('#dateRange')
+const playBtn = select('#playBtn').on('click', playPlot)
 
 Promise.all([mapDataPromise, covidDataPromise]).then((responses) => {
   indiaMapStructure = responses[0];
   let formattedData: any = formatStatesDailyData(responses[1]);
   covidCasesData = formattedData.covidCasesData;
-  covidStateAllDates = formattedData.covidStateAllDates;
+  covidStateAllDates = [...formattedData.covidStateAllDates];
   covidTotalCasesData = formattedData.covidTotalCasesData;
   adjustData(covidCasesData);
 });
 
 async function adjustData(data) {
   updateChart = plotMap(data)
+  dateSliderInitializer(covidStateAllDates, updateChart);
   playPlot();
 }
 
 async function playPlot() {
+  dateRange.attr('disabled', true)
+  playBtn.attr('disabled', true)
   for (let covidDate of covidStateAllDates) {
     updateChart(covidDate)
     await new Promise(done => setTimeout(() => done(), 100));
   }
+  dateRange.attr('disabled', null)
+  playBtn.attr('disabled', null)
 }
 
 function plotMap(covidData) {
@@ -52,14 +56,18 @@ function plotMap(covidData) {
   const colorScale = scaleLinear()
     .domain([0, 1, 100, 1000, maxValue])
     .range(['green', 'yellow', 'orange', 'rgb(255, 100, 100)', 'red']);
-  let firstDates = [...covidStateAllDates]
+  let firstDates = covidStateAllDates;
   let presentDate = firstDates[0]
 
-  let svg = select("#chart")
+  const svg = select("#chart")
+    .html("")
     .append("svg:svg")
     .attr("width", w)
     .attr("height", h)
-    .call(initialize);
+    .call(()=>{
+      proj.scale(1000);
+      proj.translate([-1140, 750]);
+    });
 
   let indiaMap = svg.append("svg:g")
     .attr("id", "india");
@@ -211,8 +219,11 @@ function plotMap(covidData) {
     .filter(function (d: any) {
       return path.area(d) > 500;
     }).remove();
+    const timeParser = timeParse("%Y-%m-%d")
+    const dateRange = select('#dateRange')
   return (date) => {
     presentDate = date;
+    dateRange.attr('value', (timeParser(date)?.getTime()) / 1000)
     dateText.text(convertDateFormatForHeading(date));
     totalCases.text("Total Cases -" + covidTotalCasesData.filter((countData) => countData.date === date)[0].totalConfirmedCases);
     indiaMap.selectAll("path").transition()
