@@ -1,4 +1,4 @@
-import { select, scaleLinear, max, line, timeParse } from "d3";
+import { select, scaleLinear, max, line, timeParse, axisBottom } from "d3";
 import { geoMercator, geoPath } from "d3-geo";
 import { getStatesDailyData, formatStatesDailyData, getIndianStatesMap } from "./service";
 import { convertDateFormatForHeading } from "../../barChartRace/js/helpers/convertDateFormatForHeading";
@@ -6,6 +6,8 @@ import { dateSliderInitializer } from "../../barChartRace/js/initializers/dateSl
 
 let w = 620;
 let h = 650;
+const colourRange: any = ['green', 'yellow', 'orange', 'rgb(255, 100, 100)', 'rgb(221, 10, 10)'];
+let scaleRange = [0, 100, 1000, 10000];
 let proj = geoMercator();
 let path = geoPath().projection(proj);
 var t = proj.translate(); // the projection's default translation
@@ -53,9 +55,10 @@ function plotMap(covidData) {
     return data.properties.st_nm !== 'Daman & Diu';
   });
   const maxValue = max(Object.values(covidData).flat(Infinity), (d: any) => Number(d.confirmed))
+  scaleRange.push(maxValue);
   const colorScale = scaleLinear()
-    .domain([0, 1, 100, 1000, maxValue])
-    .range(['green', 'yellow', 'orange', 'rgb(255, 100, 100)', 'red']);
+    .domain(scaleRange)
+    .range(colourRange);
   let firstDates = covidStateAllDates;
   let presentDate = firstDates[0]
 
@@ -63,8 +66,8 @@ function plotMap(covidData) {
     .html("")
     .append("svg:svg")
     .attr("width", w)
-    .attr("height", h)
-    .call(()=>{
+    .attr("height", h + 50)
+    .call(() => {
       proj.scale(1000);
       proj.translate([-1140, 750]);
     });
@@ -189,8 +192,8 @@ function plotMap(covidData) {
     }).remove();
   //Draw Lines
   const connectionLine = line()
-                      .x(function (d: any) { return d.x; })
-                      .y(function (d: any) { return d.y; });
+    .x(function (d: any) { return d.x; })
+    .y(function (d: any) { return d.y; });
   stateLines.selectAll("lines")
     .data(indiaMapStructure.features)
     .enter()
@@ -219,13 +222,52 @@ function plotMap(covidData) {
     .filter(function (d: any) {
       return path.area(d) > 500;
     }).remove();
-    const timeParser = timeParse("%Y-%m-%d")
-    const dateRange = select('#dateRange')
+  const timeParser = timeParse("%Y-%m-%d");
+  const dateRange = select('#dateRange');
+  //color legend
+  let legendWidth = w * 0.6;
+  let legendHeight = 10;
+  //Needed for colour gradients			
+  let defs = svg.append("defs");
+  defs.append("linearGradient")
+    .attr("id", "gradient-ygb-colors")
+    .attr("x1", "0%").attr("y1", "0%")
+    .attr("x2", "100%").attr("y2", "0%")
+    .selectAll("stop")
+    .data(colourRange)
+    .enter().append("stop")
+    .attr("offset", (d, i) => { return i / (colourRange.length - 1); })
+    .attr("stop-color", (d: any) => d);
+  const colorLegend = svg.append("g")
+    .attr("class", "legendWrapper")
+    .attr("transform", "translate(" + (w / 2 - 50) + "," + h + ")");
+  //Draw the Rectangle
+  colorLegend.append("rect")
+    .attr("class", "legendRect")
+    .attr("x", -legendWidth / 2)
+    .attr("y", 10)
+    .attr("width", legendWidth)
+    .attr("height", legendHeight)
+    .style("fill", "url(#gradient-ygb-colors)");
+  //Set scale for x-axis
+  let xScale = scaleLinear()
+    .range([0, legendWidth])
+    .domain([0, maxValue]);
+  //Define x-axis
+  let xAxis = axisBottom(xScale)
+    .ticks(5).tickFormat((d, i) => {
+      return scaleRange[i].toString();
+    });
+  //Set up X axis
+  colorLegend.append("g")
+    .attr("class", "axis")  //Assign "axis" class
+    .attr("transform", "translate(" + (-legendWidth / 2) + "," + (10 + legendHeight) + ")")
+    .call(xAxis);
   return (date) => {
     presentDate = date;
     dateRange.attr('value', (timeParser(date)?.getTime()) / 1000)
     dateText.text(convertDateFormatForHeading(date));
-    totalCases.text("Total Cases -" + covidTotalCasesData.filter((countData) => countData.date === date)[0].totalConfirmedCases);
+    totalCases.text("Total Cases - " + covidTotalCasesData.filter((countData) => countData.date === date)[0].totalConfirmedCases);
     indiaMap.selectAll("path").transition()
       .duration(800 / 1.2)
       .style('fill', (d: any) => {
