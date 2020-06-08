@@ -87,6 +87,13 @@ function plotChart(data: CovidData[][]) {
     });
     totalDeaths.text(DeathCases);
     //Calculating Total Countries
+    const totalCountries = select('#totalCountries')
+    let countries = 0;
+    data.forEach((value) => {
+        let cases = value[covidStateAllDates[0]]?.confirmed
+        countries = countries + (cases == 0 ? 0 : 1);
+    });
+    totalCountries.text(countries);
     mainSection.html('')
     data.filter(d => !!d[covidStateAllDates[0]]?.confirmed)
     const rankings = data.map((district: CovidData[]) => district[covidStateAllDates[0]])
@@ -230,7 +237,12 @@ function plotChart(data: CovidData[][]) {
             DeathCases = DeathCases + (isNaN(cases) ? 0 : cases);
         });
         totalDeaths.text(DeathCases);
-
+        let countries = 0;
+        data.forEach((value) => {
+            let cases = value[date]?.confirmed
+            countries = countries + (cases > 0 ? 1 : 0);
+        });
+        totalCountries.text(countries);
         bars.selectAll('rect')
             .transition()
             .duration(ticker / 1.2)
