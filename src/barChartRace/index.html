@@ -35,8 +35,23 @@
             <input type="range" id="dateRange" class="dateRangeClass">
         </div>
         <div class="total-cases">
-            <label for="totalCases">Total Cases -</label>
-            <label id="totalCases">0</label>
+
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th><label for="totalCases">Total Cases</label></th>
+                        <th><label for="totalDeaths">Total Deaths</label></th>
+                        <th><label for="totalCountries">Countries</label></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><label id="totalCases">0</label></td>
+                        <td><label id="totalDeaths">0</label></td>
+                        <td><label id="totalCountries">0</label></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     <div id="raceChart">
