@@ -29,10 +29,16 @@ svg {
 #dateRange {
     width: 50%;
 }
+.covid-summery {
+    margin-top: 2rem;
+}
 .covid-summery .badge {
     display: block;
     text-align: unset;
-    margin-top: 4rem;
+    margin-top: 1rem;
+}
+.covid-summery .badge:last-child {
+    margin-top: 0rem;
 }
 div.tooltip {
     position: absolute;
