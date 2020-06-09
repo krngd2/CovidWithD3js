@@ -162,7 +162,8 @@ function loadMap(indiaMapStructure, covidData ) {
     .filter(function (data) {
       return data.properties.st_nm !== 'Daman & Diu';
     });
-  const width = 620;
+  const chartElement = document.querySelector('#chart')
+  const width = chartElement.clientWidth;
   const height = 650;
 
   const svg = select("#chart")

@@ -6,7 +6,9 @@
 svg {
     background: white;
 }
-
+#chart {
+    height: 85vh;
+}
 #india {
     fill: #c7c9c6;
     opacity: 1;
