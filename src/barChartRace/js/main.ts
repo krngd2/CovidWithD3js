@@ -26,7 +26,7 @@ select('#speedRange').on('change', (d, i, n) => {
 
 getStatesData().then(async (data) => {
     totalCovidData = await addWorldData(data.districtsDaily)
-    totalCovidData = await addIndiaData(data.districtsDaily) 
+    totalCovidData = await addIndiaData(data.districtsDaily)
     dropdownInitializer(Object.keys(totalCovidData), adjustData)
     adjustData()
 })
@@ -69,6 +69,7 @@ function plotChart(data: CovidData[][]) {
     let presentDate = covidStateAllDates[0];
     const dateBig=select('#date-big')
     dateBig.text(convertDateFormatForHeading(covidStateAllDates[0]))
+    //Calulating Total Cases
     const totalCases = select('#totalCases')
     let confirmedCases = 0;
     data.forEach((value) => {
@@ -76,6 +77,22 @@ function plotChart(data: CovidData[][]) {
         confirmedCases = confirmedCases + (isNaN(cases) ? 0 : cases);
     });
     totalCases.text(confirmedCases);
+    //Calculating Total Deaths
+    const totalDeaths = select('#totalDeaths')
+    let DeathCases = 0;
+    data.forEach((value) => {
+        let cases = value[covidStateAllDates[0]]?.deceased
+        DeathCases = DeathCases + (isNaN(cases) ? 0 : cases);
+    });
+    totalDeaths.text(DeathCases);
+    //Calculating Total Countries
+    const totalCountries = select('#totalCountries')
+    let countries = 0;
+    data.forEach((value) => {
+        let cases = value[covidStateAllDates[0]]?.confirmed
+        countries = countries + (cases == 0 ? 0 : 1);
+    });
+    totalCountries.text(countries);
     mainSection.html('')
     data.filter(d => !!d[covidStateAllDates[0]]?.confirmed)
     const rankings = data.map((district: CovidData[]) => district[covidStateAllDates[0]])
@@ -150,7 +167,7 @@ function plotChart(data: CovidData[][]) {
         .style('font-size', 18)
         .html((d) => {
             return d[covidStateAllDates[0]]?.district ?? ''
-        }) 
+        })
         if (selectedState === "All-World") {
             bars.append('image')
                     .attr('class', 'flag')
@@ -212,6 +229,19 @@ function plotChart(data: CovidData[][]) {
             confirmedCases = confirmedCases + (isNaN(cases) ? 0 : cases);
         });
         totalCases.text(confirmedCases);
+
+        let DeathCases = 0;
+        data.forEach((value) => {
+            let cases = value[date]?.deceased
+            DeathCases = DeathCases + (isNaN(cases) ? 0 : cases);
+        });
+        totalDeaths.text(DeathCases);
+        let countries = 0;
+        data.forEach((value) => {
+            let cases = value[date]?.confirmed
+            countries = countries + (cases > 0 ? 1 : 0);
+        });
+        totalCountries.text(countries);
         bars.selectAll('rect')
             .transition()
             .duration(ticker / 1.2)
@@ -243,7 +273,7 @@ function plotChart(data: CovidData[][]) {
         bars.selectAll('.districtName')
             .html((d) => {
                 return d[date]?.district ?? ''
-            }) 
+            })
             .transition()
             .duration(ticker / 1.2)
             .ease(easeLinear)
@@ -254,7 +284,7 @@ function plotChart(data: CovidData[][]) {
                 }
                 return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight) + 15
             })
-            
+
         if (selectedState === "All-World") {
             bars.selectAll('.flag')
                 .attr('href', (d) => `../assets/1x1/${getCountryCode(d[date]?.district)}.svg`)
@@ -266,7 +296,7 @@ function plotChart(data: CovidData[][]) {
                     if (d[date]?.confirmed === 0) {
                         return mainSectionNode.clientHeight
                     }
-                    return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight) 
+                    return 20 * (d[date] ? (updatedRankings.findIndex((e: string) => e === d[date].district) ?? 0) : mainSectionNode.clientHeight)
                 })
         }
         select('g.x-axis')

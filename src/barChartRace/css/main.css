@@ -28,6 +28,7 @@ nav{
     transform: translate(200px, 10px);
 }
 
+
 select#select_state {
     width: 100%;
     margin-bottom: 1em;
@@ -114,4 +115,4 @@ div.tooltip {
     font-size: 26px;
     font-weight: 400;
 }
- 
+
