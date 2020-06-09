@@ -36,11 +36,17 @@ export function formatStatesDailyData(data) {
         }
     }
     let totalConfirmedCases = 0;
+    let totalDeceasedCases = 0;
+    let totalRevoveredCases = 0;
     for (let i = 0; i < totalCovidDataState.length; i = i + 3) {
         let totalCases = {
             date: "",
             confirmedCases: 0,
             totalConfirmedCases: 0,
+            deceasedCases: 0,
+            totalDeceasedCases: 0,
+            recoveredCases: 0,
+            totalRevoveredCases: 0,
         }
         for (let p in totalCovidDataState[i]) {
             if (p in stateCodes) {
@@ -51,14 +57,26 @@ export function formatStatesDailyData(data) {
                     date: convertDate(totalCovidDataState[i]['date']),
                     stateCode: p.toUpperCase()
                 }
+                covidStateAllDates.add(convertDate(totalCovidDataState[i]['date']));
+                covidCasesData[stateCodes[p]].push(obj);
                 totalCases.date = convertDate(totalCovidDataState[i]['date']);
+                //confirmed cases
                 totalCases.confirmedCases += Number(totalCovidDataState[i][p]);
                 totalConfirmedCases += Number(totalCovidDataState[i][p]);
-                covidStateAllDates.add(convertDate(totalCovidDataState[i]['date']));
-                covidCasesData[stateCodes[p]].push(obj)
+                //Deceased Cases
+                totalCases.deceasedCases += Number(totalCovidDataState[i + 2][p]);
+                totalDeceasedCases += Number(totalCovidDataState[i + 2][p]);
+                //Recovered Cases
+                totalCases.recoveredCases += Number(totalCovidDataState[i + 1][p]);
+                totalRevoveredCases += Number(totalCovidDataState[i + 1][p]);
             }
         }
+        //total confirmed cases
         totalCases.totalConfirmedCases = totalConfirmedCases;
+        //total deceased cases
+        totalCases.totalDeceasedCases = totalDeceasedCases;
+        //total recovered cases
+        totalCases.totalRevoveredCases = totalRevoveredCases;
         covidTotalCasesData.push(totalCases);
     }
     for (let p in covidCasesData) {

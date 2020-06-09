@@ -23,15 +23,37 @@
   </nav>
   <h3 id="heading" class="text-center">Covid-19 India Map</h3>
   <div class="container">
-      <div class="details">
-        <div class="date-big-picker date-div">
-            <label id="date-big">Date</label>
-            <input type="range" id="dateRange" class="dateRangeClass">
-            <button class="btn btn-primary"  id="playBtn" type="button" aria-label="Left Align">
-              <span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
-              Play
-            </button>
+    <div class="details">
+      <div class="date-big-picker date-div">
+        <label id="date-big">Date</label>
+        <input type="range" id="dateRange" class="dateRangeClass">
+        <button class="btn btn-primary" id="playBtn" type="button" aria-label="Left Align">
+          <span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
+          Play
+        </button>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-8 col-lg-8 offset-md-2 offset-lg-2">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <div class="badge">
+            <h3 class="text-warning" id="totalConfirmedCases">0</h3>
+            <h6>Total Cases</h6>
+          </div>
         </div>
+        <div class="col-md-4 text-center">
+          <div class="badge">
+            <h3 class="text-danger" id="totalDeathCases">0</h3>
+            <h6>Total Deaths</h6>
+          </div>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="badge">
+            <h3 class="text-success" id="totalRecoveredCases">0</h3>
+            <h6>Total Recovered</h6>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="col-sm-12 col-md-8 col-lg-8 offset-md-2 offset-lg-2 text-center">
       <div id="chart">
