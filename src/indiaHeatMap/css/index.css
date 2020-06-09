@@ -17,17 +17,22 @@ svg {
 }
 
 .details {
+    width: 60vw;
     margin: 1rem;
 }
-
 .details .date-div,
 .details .ticker-div {
-    width: 100%;
+    /* width: 100%; */
     text-align: center;
-    margin-top: 1rem;
+    /* margin-top: 1rem; */
 }
 #dateRange {
     width: 50%;
+}
+.covid-summery .badge {
+    display: block;
+    text-align: unset;
+    margin-top: 4rem;
 }
 div.tooltip {
     position: absolute;
