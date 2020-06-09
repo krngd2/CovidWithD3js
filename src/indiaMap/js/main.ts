@@ -20,7 +20,7 @@ Promise.all([mapDataPromise, covidDataPromise]).then((responses) => {
   const covidCasesData = formattedData.covidCasesData;
   covidStateAllDates = [...formattedData.covidStateAllDates];
   covidTotalCasesData = formattedData.covidTotalCasesData;
-  loadMap(covidCasesData, indiaMapStructure);
+  loadMap(indiaMapStructure, covidCasesData);
   adjustData(covidCasesData);
 });
 
@@ -43,8 +43,8 @@ async function playPlot() {
 
 function plotMap(covidData) {
   const maxValue = max(Object.values(covidData).flat(Infinity), (d: any) => Number(d.confirmed))
-  const scaleRange = [0, 10, 100, 1000, maxValue];
-  const colourRange: any = ['green', '#fb6947', '#fb6947', 'red', '#66000d'];
+  const scaleRange =        [0,     1,      100,      1000,       10000,     50000  ,    maxValue];
+  const colourRange: any = ['green','yellow', 'orange', '#ff5656', 'red', '#8e2c2c', '#66000d'];
   const colorScale = scaleLinear()
     .domain(scaleRange)
     .range(colourRange);
@@ -57,7 +57,7 @@ function plotMap(covidData) {
   const height = svg.node().clientHeight;
 
   const dateText = svg.append('text')
-    .attr('x', 360)
+    .attr('x', 230)
     .attr('y', 50)
     .style('font-size', '24px')
     .style('font-weight', '600')
@@ -128,7 +128,7 @@ function plotMap(covidData) {
 
   //Set scale for x-axis
   const xScale = scaleQuantile()
-    .range([0, legendWidth / 4, legendWidth / 2, legendWidth / 1.5, legendWidth])
+    .range([0, legendWidth *0.15, legendWidth * 0.35, legendWidth * 0.50, legendWidth *0.65, legendWidth * 0.85  , legendWidth])
     .domain(scaleRange);
 
   //Set up X axis
@@ -155,7 +155,7 @@ function plotMap(covidData) {
   }
 }
 
-function loadMap(covidData, indiaMapStructure) {
+function loadMap(indiaMapStructure, covidData ) {
   const proj = geoMercator();
   const path = geoPath().projection(proj);
   indiaMapStructure.features = indiaMapStructure.features
