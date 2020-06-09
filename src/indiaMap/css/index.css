@@ -13,27 +13,29 @@ svg {
     stroke: #000000;
     stroke-width: 0.6;
 }
-.c0 {
-    fill: #c7c9c6;
+
+.details {
+    margin: 2rem;
 }
-.c1-49 {
-    fill: #ffd6d6;
+
+.details .date-div,
+.details .ticker-div {
+    width: 100%;
+    text-align: center;
+    margin-top: 1rem;
 }
-.c50-99 {
-    fill: #ffacac;
+#dateRange {
+    width: 50%;
 }
-.c100-499 {
-    fill: #ff8181;
-}
-.c500-999 {
-    fill: #ff5454;
-}
-.c1000-4999 {
-    fill: #ff2625;
-}
-.c5000-9999 {
-    fill: #d50000;
-}
-.c10000 {
-    fill: #890000;
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 150px;
+    padding: 2px;
+    font: 12px sans-serif;
+    pointer-events: none;
+    background-color: wheat;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0px 0px 6px 6px grey;
 }

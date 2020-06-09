@@ -2,7 +2,7 @@ export const stateCodes = {
     'un': "State Unassigned",
     'an': "Andaman & Nicobar Island",
     'ap': "Andhra Pradesh",
-    'ar': "Arunachal Pradesh",
+    'ar': "Arunanchal Pradesh",
     'as': "Assam",
     'br': "Bihar",
     'ch': "Chandigarh",

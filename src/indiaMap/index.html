@@ -7,10 +7,38 @@
   <title>Covid-19 Cases in India</title>
   <!--  Styles  -->
   <link type="text/css" rel="stylesheet" href="css/index.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 </head>
 
 <body>
-  <div id="chart"></div>
+  <nav class="navbar navbar-light justify-content-center">
+    <a class="navbar-brand CLLlogo" href="https://bit.ly/CLLYT" target="blank">
+      <img src="../assets/images/CLLlogo.png" width="150" class="d-inline-block align-top first-img"
+        alt="CO-learning Lounge Logo">
+    </a>
+    <div class="vl"></div>
+    <a class="navbar-brand SOAILogo" href="https://bit.ly/CLLYT" target="blank">
+      <img src="../assets/images/SOAILogo.png" width="150" class="d-inline-block align-top" alt="SOAI Logo">
+    </a>
+  </nav>
+  <h3 id="heading" class="text-center">Covid-19 India Map</h3>
+  <div class="container">
+      <div class="details">
+        <div class="date-big-picker date-div">
+            <label id="date-big">Date</label>
+            <input type="range" id="dateRange" class="dateRangeClass">
+            <button class="btn btn-primary"  id="playBtn" type="button" aria-label="Left Align">
+              <span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
+              Play
+            </button>
+        </div>
+    </div>
+    <div class="col-sm-12 col-md-8 col-lg-8 offset-md-2 offset-lg-2 text-center">
+      <div id="chart">
+        <h4>Loading map...</h4>
+      </div>
+    </div>
+  </div>
   <script type="text/javascript" src="js/main.ts"></script>
 </body>
 

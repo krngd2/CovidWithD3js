@@ -63,7 +63,7 @@ function plotChart(data: []) {
             .attr("class", "tooltip")
             .style("opacity", 0);
     contries.on('mouseover', (d, i) => {
-        if (d.r > 15) return;
+        // if (d.r > 15) return;
         div.transition()
             .duration(200)
             .style("opacity", .9);
