@@ -164,8 +164,7 @@ function loadMap(indiaMapStructure, covidData ) {
     });
   const chartElement = document.querySelector('#chart')
   const width = chartElement.clientWidth;
-  const height = 650
-  ;
+  const height = 650;
 
   const svg = select("#chart")
     .html("")

@@ -11,34 +11,52 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-light">
-    <div class="col-md-2">
-      <a class="navbar-brand CLLlogo" href="https://bit.ly/CLLYT" target="blank">
-        <img src="../assets/images/CLLlogo.png" width="150" class="d-inline-block align-top first-img"
-          alt="CO-learning Lounge Logo">
-      </a>
-    </div>
-    <h3 id="heading" class="text-center">Covid-19 India Heat Map</h3>
-    
-    <div class="col-md-2">
-        <a class="navbar-brand SOAILogo" href="https://bit.ly/CLLYT" target="blank">
-          <img src="../assets/images/SOAILogo.png" width="150" class="d-inline-block align-top" alt="SOAI Logo">
-        </a>
-    </div>
+  <nav class="navbar navbar-light justify-content-center">
+    <a class="navbar-brand CLLlogo" href="https://bit.ly/CLLYT" target="blank">
+      <img src="../assets/images/CLLlogo.png" width="150" class="d-inline-block align-top first-img"
+        alt="CO-learning Lounge Logo">
+    </a>
+    <div class="vl"></div>
+    <a class="navbar-brand SOAILogo" href="https://bit.ly/CLLYT" target="blank">
+      <img src="../assets/images/SOAILogo.png" width="150" class="d-inline-block align-top" alt="SOAI Logo">
+    </a>
   </nav>
-  <div class="details">
-    <div class="date-big-picker date-div ml-5">
-      <label id="date-big">Date</label>
-      <input type="range" id="dateRange" class="dateRangeClass">
-      <button class="btn btn-primary" id="playBtn" type="button" aria-label="Left Align">
-        <span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
-        Play
-      </button>
+  <h3 id="heading" class="text-center">Covid-19 India Map</h3>
+  <div class="container">
+    <div class="details">
+      <div class="date-big-picker date-div">
+        <label id="date-big">Date</label>
+        <input type="range" id="dateRange" class="dateRangeClass">
+        <button class="btn btn-primary" id="playBtn" type="button" aria-label="Left Align">
+          <span class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>
+          Play
+        </button>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-12 col-md-8 col-lg-8 text-center">
-      <div id="chart" class=" ml-2">
+    <div class="col-sm-12 col-md-8 col-lg-8 offset-md-2 offset-lg-2">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <div class="badge">
+            <h3 class="text-warning" id="totalConfirmedCases">0</h3>
+            <h6>Total Cases</h6>
+          </div>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="badge">
+            <h3 class="text-danger" id="totalDeathCases">0</h3>
+            <h6>Total Deaths</h6>
+          </div>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="badge">
+            <h3 class="text-success" id="totalRecoveredCases">0</h3>
+            <h6>Total Recovered</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-8 col-lg-8 offset-md-2 offset-lg-2 text-center">
+      <div id="chart">
         <h4>Loading map...</h4>
       </div>
     </div>
