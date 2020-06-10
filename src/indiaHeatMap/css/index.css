@@ -17,6 +17,7 @@ svg {
 .details {
     width: 60vw;
     margin: 1rem;
+    text-align-last: right;
 }
 .details .date-div,
 .details .ticker-div {
