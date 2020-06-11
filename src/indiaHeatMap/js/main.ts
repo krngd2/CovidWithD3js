@@ -57,7 +57,7 @@ function plotMap(covidData) {
   const height = svg.node().clientHeight;
 
   const dateText = svg.append('text')
-    .attr('x', 350)
+    .attr('x', 220)
     .attr('y', 50)
     .style('font-size', '24px')
     .style('font-weight', '600')
