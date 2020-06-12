@@ -1,0 +1,23 @@
+export interface SymptomsInterface {
+    sno: number,
+    age: number,
+    gender: number,
+    body_temperature: number,
+    dry_cough: number,
+    sour_throat: number,
+    weakness: number,
+    breathing_problem: number,
+    drowsiness: number,
+    chest_pain: number,
+    travel_history_to_infected_countries: number,
+    diabetes: number,
+    heart_disease: number,
+    lung_disease: number,
+    stroke_or_reduced_immunity: number,
+    symptoms_progressed: number,
+    high_blood_pressue: number,
+    kidney_disease: number,
+    change_in_appetide: number,
+    loss_of_sense_of_smell: number,
+    corona_result: number
+}
