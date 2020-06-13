@@ -1,7 +1,8 @@
 import { SymptomsInterface } from "../inteface/data.interface";
 import { LinksSankey } from "../inteface/links.interface";
+import { SankeyInterface } from "../inteface/sankey.interface";
 
-export function maniputaleData(data:any) {
+export function maniputaleData(data:any): SankeyInterface {
     return {
         nodes: getNodes(data),
         links: getLinks(data)

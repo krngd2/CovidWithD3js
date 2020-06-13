@@ -1,6 +1,6 @@
 import { LinksSankey } from "./links.interface";
 
 export interface SankeyInterface {
-    nodes: number[],
+    nodes: {name:string}[],
     links: LinksSankey[]
 }
