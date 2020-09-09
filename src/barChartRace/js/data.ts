@@ -2,7 +2,7 @@ import { stateCodes } from "./mappers/states.mapper"
 import { convertDate } from "./helpers/convertDate"
 
 export async function getStatesData() { 
-    return fetch('https://api.covid19india.org/districts_daily.json')
+    return fetch('https://api.covid19india.org/state_district_wise.json')
         .then(res => res.json())
         .then((data: any) => {
             return data
@@ -10,7 +10,7 @@ export async function getStatesData() {
         .catch(console.error)
 }
 
-export async function addIndiaData(data){
+export async function addIndiaData(data = {}){
     let India = {}
     await fetch('https://api.covid19india.org/states_daily.json')
         .then(res => res.json())

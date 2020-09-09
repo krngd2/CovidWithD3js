@@ -24,9 +24,10 @@ select('#speedRange').on('change', (d, i, n) => {
     ticker = Math.abs(n[0].value);
 })
 
-getStatesData().then(async (data) => {
-    totalCovidData = await addWorldData(data.districtsDaily)
-    totalCovidData = await addIndiaData(data.districtsDaily)
+addIndiaData().then(async (data) => {
+    // totalCovidData = await addWorldData(data.districtsDaily)
+    // totalCovidData = await addIndiaData(data.districtsDaily)
+    totalCovidData = data
     dropdownInitializer(Object.keys(totalCovidData), adjustData)
     adjustData()
 })
